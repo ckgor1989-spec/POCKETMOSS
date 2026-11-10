@@ -1,0 +1,125 @@
+/* ====== GBA 色板变量 ====== */
+:root {
+  --gba-dark:  #0f380f;
+  --gba-mid:   #306230;
+  --gba-light: #8bac0f;
+  --gba-bg:    #9bbc0f;
+  --safe-top:  env(safe-area-inset-top, 0px);
+  --safe-bot:  env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; }
+body {
+  font-family: 'Courier New', monospace;
+  -webkit-user-select: none; user-select: none;
+  touch-action: manipulation;
+  image-rendering: pixelated;
+}
+
+#app {
+  width: 100vw; height: 100vh;
+  display: flex; flex-direction: column;
+  overflow: hidden; position: relative;
+  background: #0a0a0a;
+}
+
+/* ===== 顶部 HUD ===== */
+.hud-top {
+  background: rgba(0,0,0,0.88);
+  padding: calc(6px + var(--safe-top)) 8px 6px;
+  border-bottom: 2px solid var(--gba-mid);
+  flex-shrink: 0; z-index: 50;
+}
+.hud-row-1 {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; letter-spacing: 1px; color: var(--gba-bg); margin-bottom: 4px;
+}
+.hud-pets-row {
+  display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.hud-pets-row::-webkit-scrollbar { display: none; }
+.hud-pet-chip {
+  flex: 0 0 auto; background: #1a1a1a; border: 1px solid var(--gba-mid);
+  padding: 3px 5px; display: flex; flex-direction: column; gap: 2px;
+  min-width: 52px; cursor: pointer;
+}
+.hud-pet-chip.active { border-color: var(--gba-bg); background: #1e2a1e; }
+.hud-pet-chip .name { font-size: 9px; color: var(--gba-bg); text-align: center; }
+.hud-pet-chip .avatar { width: 14px; height: 14px; border-radius: 2px; margin: 0 auto; }
+.hud-pet-chip .bar { height: 3px; background: #333; }
+.hud-pet-chip .bar > div { height: 100%; transition: width 0.4s; }
+
+/* ===== 2.5D 场景区 ===== */
+.scene-wrap {
+  flex: 1; position: relative; overflow: hidden;
+  background: #022c22;
+}
+#scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.sprite-layer, .bubble-layer { position: absolute; inset: 0; pointer-events: none; }
+.sprite-unit { pointer-events: auto; }
+
+/* 呼吸动画 */
+@keyframes breath {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50%      { filter: drop-shadow(0 0 4px rgba(255,255,255,0.15)); }
+}
+.sprite-unit { animation: breath 3s ease-in-out infinite; }
+
+/* 点击爆散粒子 */
+@keyframes particle-fly {
+  from { transform: translate(0,0) scale(1); opacity: 1; }
+  to   { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
+}
+.particle {
+  position: absolute; width: 6px; height: 6px; border-radius: 1px;
+  animation: particle-fly 0.6s ease-out forwards;
+  pointer-events: none; z-index: 100;
+}
+
+/* AI 对话气泡 */
+.bubble {
+  position: absolute; pointer-events: none;
+  background: var(--gba-bg); color: var(--gba-dark);
+  padding: 6px 10px; border-radius: 8px;
+  border: 2px solid var(--gba-dark);
+  font-size: 11px; font-family: 'Courier New', monospace;
+  max-width: 160px; text-align: center;
+  transform: translateX(-50%);
+  animation: bubble-in 0.25s ease-out;
+  z-index: 60;
+  box-shadow: 0 2px 0 var(--gba-dark);
+}
+@keyframes bubble-in {
+  from { transform: translateX(-50%) translateY(6px); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* ===== 底部 5 按钮 ===== */
+.quick-bar {
+  background: rgba(0,0,0,0.88); border-top: 2px solid var(--gba-mid);
+  display: flex; justify-content: space-around;
+  padding: 8px 4px calc(8px + var(--safe-bot));
+  flex-shrink: 0; z-index: 50;
+}
+.qb-btn {
+  background: #1a1a1a; border: 2px solid var(--gba-mid); color: var(--gba-bg);
+  font-family: 'Courier New', monospace; font-size: 11px;
+  padding: 6px 4px; display: flex; flex-direction: column; align-items: center;
+  gap: 2px; min-width: 56px; cursor: pointer;
+  border-radius: 4px; transition: background 0.1s, transform 0.08s;
+}
+.qb-btn:active { background: var(--gba-mid); transform: scale(0.96); }
+.qb-btn.qb-ai { background: var(--gba-bg); color: var(--gba-dark); border-color: var(--gba-dark); font-weight: bold; }
+.qb-btn.qb-ai:active { background: var(--gba-light); }
+
+/* Toast */
+.toast {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.9); color: var(--gba-bg);
+  padding: 10px 20px; border: 2px solid var(--gba-mid); border-radius: 6px;
+  font-size: 13px; font-family: 'Courier New', monospace;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200;
+}
+.toast.show { opacity: 1; }

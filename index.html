@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#9bbc0f">
+<title>POCKETMOSS</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="app">
+  <!-- 顶部 HUD Grid (方案 C) -->
+  <header id="hud-top" class="hud-top">
+    <div class="hud-row-1">
+      <span id="scene-name" class="hud-scene">▲ FOREST</span>
+      <span id="battery" class="hud-batt">BATT●●●●</span>
+      <span id="clock" class="hud-clock">--:--</span>
+    </div>
+    <div id="hud-pets" class="hud-pets-row"></div>
+  </header>
+
+  <!-- 2.5D 场景 Canvas + 精灵 DOM 层 + 对话气泡层 -->
+  <main id="scene-wrap" class="scene-wrap">
+    <canvas id="scene-canvas"></canvas>
+    <div id="sprite-layer" class="sprite-layer"></div>
+    <div id="bubble-layer" class="bubble-layer"></div>
+  </main>
+
+  <!-- 底部 5 按钮快捷栏 -->
+  <nav id="quick-bar" class="quick-bar">
+    <button class="qb-btn" data-action="feed">🍖<span>喂食</span></button>
+    <button class="qb-btn" data-action="play">🎾<span>玩耍</span></button>
+    <button class="qb-btn" data-action="clean">🧼<span>清洁</span></button>
+    <button class="qb-btn qb-ai" data-action="talk">💬<span>对话</span></button>
+    <button class="qb-btn" data-action="walk">▶<span>散步</span></button>
+  </nav>
+
+  <!-- 状态 toast -->
+  <div id="toast" class="toast"></div>
+</div>
+<script type="module" src="js/game.js"></script>
+</body>
+</html>
