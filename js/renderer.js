@@ -984,22 +984,22 @@ export class SceneRenderer {
     const { W, H } = this;
     const n = pets.length;
     const positions = [];
-    const depths = n <= 1 ? [0.5] : linspace(0.30, 0.80, n);
+    const depths = n <= 1 ? [0.5] : linspace(0.34, 0.78, n);
     pets.forEach((pet, i) => {
       const t = depths[i];
-      const horizon = H * 0.62;
-      const groundBot = H - 18;
-      const scale = 0.66 + t * 0.60;
-      const halfH = 71 * scale;
-      const y = Math.min(horizon + (groundBot - horizon) * t, H - halfH - 8);
-      const jitter = (Math.random() - 0.5) * 0.10;
-      const baseX = 0.5 + (i - (n - 1) / 2) * 0.165;
-      const x = W * clamp(baseX + jitter, 0.15, 0.85);
+      const horizon = H * 0.64;
+      const groundBot = H - 16;
+      const scale = 0.90 + t * 0.18;
+      const halfH = 59 * scale;
+      const y = Math.min(horizon + (groundBot - horizon) * t, H - halfH - 6);
+      const jitter = (Math.random() - 0.5) * 0.04;
+      const baseX = 0.5 + (i - (n - 1) / 2) * 0.175;
+      const x = W * clamp(baseX + jitter, 0.16, 0.84);
       positions.push({ petId: pet.id, x, y, depth: t });
     });
     return positions.sort((a, b) => a.depth - b.depth);
   }
 
-  /** depth 0 → 0.66 倍, depth 1 → 1.26 倍 */
-  static depthToScale(depth) { return 0.66 + depth * 0.60; }
+  /** depth 0 → 0.90 倍, depth 1 → 1.08 倍（弱透视，保持体量一致） */
+  static depthToScale(depth) { return 0.90 + depth * 0.18; }
 }

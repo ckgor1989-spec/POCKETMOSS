@@ -1,16 +1,17 @@
 /**
- * 像素精灵 v4 —— 48×48 参数化像素绘制
- * 风格目标：宝可梦 GBA 精灵 —— 彩色描边 + 4 阶明暗 + 眼白高光 + 干净剪影
+ * 像素精灵 v5 —— 48×48 参数化像素绘制
+ * 风格目标：明亮像素宠物 —— 大头短身、大眼高光、三阶平涂、统一藏青墨线
  *
  * 绘制流程：
- *   1. 每只精灵用几何基元（椭圆/三角/胶囊/矩形）铺出"色块蒙版"
- *   2. 自动生成描边（蒙版外 1px，取阴影色压暗）
- *   3. 按左上打光生成 4 阶明暗（高光 / 本体 / 阴影 / 深阴影）
- *   4. 眼睛内部自动点白高光
+ *   1. 几何基元（椭圆/三角/胶囊/矩形）铺出"色块蒙版"
+ *   2. 蒙版外 1px 自动描边，全部统一 #2f2b4a
+ *   3. 左上打光三阶平涂（亮 / 本体 / 暗），不做全画布抖动
+ *   4. 眼睛内置 3px 高光 + 小反光，腮红统一 #ffb3c7
  */
 
 const G = 48;
 const EMPTY = '.';
+const INK = '#2f2b4a';
 
 const inB = (x, y) => x >= 0 && y >= 0 && x < G && y < G;
 const idx = (x, y) => y * G + x;
@@ -97,20 +98,23 @@ function makePainter(g) {
     tri: (ax, ay, bx, by, cx, cy, ch = 'b') => fillTri(g, ax, ay, bx, by, cx, cy, ch),
     capsule: (x1, y1, x2, y2, r, ch = 'b') => fillCapsule(g, x1, y1, x2, y2, r, ch),
     px: (x, y, ch = 'b') => { if (inB(x, y)) g[idx(x, y)] = ch; },
-    /** 眼睛：黑瞳 + 左上角 2px 白高光 */
+    /** 大眼：深色椭圆 + 左上 3px 高光 + 右下 1px 反光 */
     eye(x, y, rx, ry = rx) {
       fillEllipse(g, x, y, rx, ry, 'e');
-      const gx = Math.round(x - rx * 0.5), gy = Math.round(y - ry * 0.5);
+      const gx = Math.round(x - rx * 0.42), gy = Math.round(y - ry * 0.42);
       if (inB(gx, gy)) g[idx(gx, gy)] = 'w';
       if (inB(gx + 1, gy)) g[idx(gx + 1, gy)] = 'w';
+      if (inB(gx, gy + 1)) g[idx(gx, gy + 1)] = 'w';
+      const hx = Math.round(x + rx * 0.34), hy = Math.round(y + ry * 0.34);
+      if (inB(hx, hy)) g[idx(hx, hy)] = 'w';
     },
-    /** 眼下的 3px 腮红 */
+    /** 眼下 3px 腮红 */
     blush(x, y) {
       for (let i = -1; i <= 1; i++) {
         if (inB(x + i, y)) g[idx(x + i, y)] = 'k';
       }
     },
-    /** 弧线（w 正数向下微笑，负数向上眯眼） */
+    /** 微笑弧线（w 正数向下，负数向上眯眼） */
     arc(cx, cy, half, depth, ch = 'e') {
       for (let i = -half; i <= half; i++) {
         const x = Math.round(cx + i);
@@ -122,265 +126,263 @@ function makePainter(g) {
 }
 
 // ===== 15 只精灵的造型定义 =====
+// 统一比例：头身一体化圆体，眼位于 y=20~32，脚落在 y=43，四周留 4px 安全边
 const SPECIES = {
-  // 苔藓兽：圆胖苔藓团，头顶双嫩芽
+  // 苔藓兽：圆苔藓团 + 两片嫩芽
   blob(p) {
-    p.ellipse(15, 42, 6, 4);
-    p.ellipse(33, 42, 6, 4);
-    p.ellipse(24, 29, 16, 15);
-    p.rect(23, 10, 2, 5, 'A');
-    p.tri(23, 13, 12, 3, 17, 15, 'A');
-    p.tri(25, 13, 36, 3, 31, 15, 'A');
-    p.ellipse(24, 38, 9, 5.5, 'A');
-    p.eye(18, 27, 3.2, 3.8);
-    p.eye(30, 27, 3.2, 3.8);
+    p.ellipse(16, 43, 5, 3);
+    p.ellipse(32, 43, 5, 3);
+    p.rect(23, 11, 2, 7, 'A');
+    p.ellipse(19, 10, 4.2, 3.2, 'A');
+    p.ellipse(29, 10, 4.2, 3.2, 'A');
+    p.ellipse(24, 28, 14, 14);
+    p.eye(19, 26, 3.2, 3.8);
+    p.eye(29, 26, 3.2, 3.8);
     p.blush(14, 32);
     p.blush(34, 32);
-    p.arc(24, 34, 4, 1.6);
+    p.arc(24, 33, 3, 1.2);
   },
   // 蘑菇灵：宽菌盖白斑 + 圆菌柄
   mushroom(p) {
-    p.ellipse(13, 35, 4, 3);
-    p.ellipse(35, 35, 4, 3);
-    p.ellipse(24, 33, 9, 10);
-    p.ellipse(24, 17, 18, 12);
-    p.ellipse(13, 13, 3.5, 2.5, 'w');
-    p.ellipse(25, 10, 4, 2.5, 'w');
-    p.ellipse(34, 17, 2.6, 2, 'w');
-    p.ellipse(19, 20, 2.4, 1.8, 'w');
+    p.ellipse(16, 43, 4, 3);
+    p.ellipse(32, 43, 4, 3);
+    p.ellipse(24, 34, 10, 10);
+    p.ellipse(24, 27, 10, 8);
     p.eye(20, 32, 3, 3.4);
     p.eye(28, 32, 3, 3.4);
-    p.blush(15, 37);
-    p.blush(33, 37);
-    p.arc(24, 38, 3, 1.2);
+    p.blush(16, 36);
+    p.blush(32, 36);
+    p.arc(24, 37, 2.5, 1);
+    p.ellipse(24, 19, 17, 12);
+    p.ellipse(13, 14, 3.2, 2.4, 'w');
+    p.ellipse(25, 11, 3.6, 2.4, 'w');
+    p.ellipse(33, 18, 2.6, 1.8, 'w');
+    p.ellipse(17, 21, 2.2, 1.6, 'w');
   },
-  // 藤叶精：方身 + 两片斜出的叶子
+  // 藤叶精：圆身 + 两片斜出的叶子
   leafy(p) {
     p.ellipse(16, 43, 5, 3);
     p.ellipse(32, 43, 5, 3);
-    p.ellipse(24, 31, 12, 13);
-    p.tri(25, 17, 9, 4, 14, 19, 'A');
-    p.tri(23, 17, 39, 4, 34, 19, 'A');
-    p.rect(23, 14, 2, 5, 'A');
-    p.eye(19, 29, 2.8, 3.4);
-    p.eye(29, 29, 2.8, 3.4);
+    p.tri(24, 16, 9, 4, 16, 20, 'A');
+    p.tri(24, 16, 39, 4, 32, 20, 'A');
+    p.rect(23, 13, 2, 7, 'A');
+    p.ellipse(24, 29, 13, 13);
+    p.eye(19, 27, 3, 3.6);
+    p.eye(29, 27, 3, 3.6);
     p.blush(15, 33);
     p.blush(33, 33);
-    p.arc(24, 35, 3, 1.4);
+    p.arc(24, 34, 3, 1.2);
   },
   // 炎狐：尖耳 + 白口鼻 + 蓬松尾巴
   fox(p) {
-    p.capsule(36, 35, 44, 23, 4);
-    p.ellipse(44, 22, 2.6, 2.6, 'w');
-    p.ellipse(15, 42, 5, 3);
-    p.ellipse(33, 42, 5, 3);
-    p.ellipse(24, 32, 12, 11);
-    p.tri(13, 13, 16, 1, 25, 12);
-    p.tri(35, 13, 32, 1, 23, 12);
-    p.tri(16.5, 12, 17.8, 5, 22.5, 12, 'A');
-    p.tri(31.5, 12, 30.2, 5, 25.5, 12, 'A');
-    p.ellipse(24, 20, 11, 10);
-    p.ellipse(24, 26, 5.5, 4.5, 'w');
-    p.px(23, 23, 'e');
-    p.px(24, 23, 'e');
-    p.eye(19, 18, 2.6, 3);
-    p.eye(29, 18, 2.6, 3);
-    p.blush(14, 22);
-    p.blush(34, 22);
-    p.ellipse(24, 36, 6, 4.5, 'A');
+    p.capsule(34, 37, 43, 27, 3.4);
+    p.ellipse(44, 25, 2.4, 2.4, 'w');
+    p.ellipse(16, 43, 5, 3);
+    p.ellipse(32, 43, 5, 3);
+    p.ellipse(24, 35, 10, 8);
+    p.ellipse(24, 22, 13, 12);
+    p.tri(13, 17, 10, 4, 24, 15);
+    p.tri(35, 17, 38, 4, 24, 15);
+    p.tri(15, 15, 14, 7, 21, 15, 'A');
+    p.tri(33, 15, 34, 7, 27, 15, 'A');
+    p.ellipse(24, 28, 5.4, 3.8, 'w');
+    p.px(23, 26, 'e');
+    p.px(24, 26, 'e');
+    p.eye(19, 21, 2.8, 3.2);
+    p.eye(29, 21, 2.8, 3.2);
+    p.blush(14, 25);
+    p.blush(34, 25);
   },
-  // 熔岩精：大团熔岩 + 发光裂纹
+  // 熔岩精：大团熔岩 + 头顶小火苗
   lavablob(p) {
-    p.ellipse(15, 42, 6, 4);
-    p.ellipse(33, 42, 6, 4);
-    p.ellipse(24, 30, 16, 14);
-    p.capsule(17, 24, 14, 33, 0.9, 'A');
-    p.capsule(31, 22, 34, 31, 0.9, 'A');
-    p.capsule(21, 38, 29, 39, 0.9, 'A');
+    p.ellipse(15, 43, 6, 4);
+    p.ellipse(33, 43, 6, 4);
+    p.tri(24, 8, 20, 17, 28, 17, 'A');
+    p.ellipse(24, 29, 15, 14);
+    p.capsule(16, 25, 13, 33, 0.9, 'A');
+    p.capsule(32, 24, 34, 32, 0.9, 'A');
     p.eye(18, 28, 3, 3.6);
     p.eye(30, 28, 3, 3.6);
-    p.arc(24, 35, 4, 1.8);
+    p.blush(14, 34);
+    p.blush(34, 34);
+    p.arc(24, 35, 3.5, 1.4);
   },
-  // 火星种：小圆身 + 头顶火花 + 四散火星
+  // 火星种：小圆身 + 头顶火花
   spark(p) {
-    p.capsule(24, 14, 24, 21, 1.1, 'A');
-    p.px(24, 11, 'w'); p.px(23, 12, 'w'); p.px(25, 12, 'w');
-    p.capsule(10, 18, 14, 21, 1.4, 'A');
-    p.capsule(38, 18, 34, 21, 1.4, 'A');
-    p.capsule(9, 37, 13, 34, 1.4, 'A');
-    p.capsule(39, 37, 35, 34, 1.4, 'A');
-    p.ellipse(15, 43, 4, 3);
-    p.ellipse(33, 43, 4, 3);
-    p.ellipse(24, 31, 11, 11);
-    p.eye(20, 29, 2.6, 3.2);
-    p.eye(28, 29, 2.6, 3.2);
-    p.blush(16, 33);
-    p.blush(32, 33);
-    p.arc(24, 35, 3, 1.4);
+    p.ellipse(16, 43, 4, 3);
+    p.ellipse(32, 43, 4, 3);
+    p.capsule(24, 15, 24, 20, 1.2, 'A');
+    p.px(24, 10, 'w');
+    p.px(23, 11, 'w');
+    p.px(25, 11, 'w');
+    p.px(24, 12, 'w');
+    p.px(24, 13, 'w');
+    p.ellipse(24, 30, 11, 11);
+    p.eye(20, 29, 2.8, 3.4);
+    p.eye(28, 29, 2.8, 3.4);
+    p.blush(16, 34);
+    p.blush(32, 34);
+    p.arc(24, 35, 2.5, 1);
+    p.px(9, 21, 'w');
+    p.px(39, 23, 'w');
+    p.px(11, 38, 'w');
+    p.px(37, 37, 'w');
   },
   // 水滴蛙：宽身 + 顶部大眼泡
   frog(p) {
-    p.ellipse(9, 43, 6, 3.5);
-    p.ellipse(39, 43, 6, 3.5);
+    p.ellipse(7, 43, 5, 3);
+    p.ellipse(41, 43, 5, 3);
     p.ellipse(24, 33, 16, 11);
-    p.ellipse(14, 22, 7, 7);
-    p.ellipse(34, 22, 7, 7);
-    p.ellipse(24, 38, 9, 4.5, 'A');
-    p.eye(14, 21, 2.8, 3.2);
-    p.eye(34, 21, 2.8, 3.2);
-    p.blush(10, 28);
-    p.blush(38, 28);
-    p.arc(24, 32, 8, 2);
+    p.ellipse(14, 22, 7.5, 7.5);
+    p.ellipse(34, 22, 7.5, 7.5);
+    p.ellipse(24, 38, 8, 3.5, 'A');
+    p.eye(14, 21, 3, 3.4);
+    p.eye(34, 21, 3, 3.4);
+    p.blush(8, 28);
+    p.blush(40, 28);
+    p.arc(24, 32, 5, 1.8);
   },
   // 水母灵：伞盖 + 四条波浪飘带
   jelly(p) {
-    p.capsule(16, 30, 14, 36, 1.6);
-    p.capsule(14, 36, 17, 41, 1.6);
-    p.capsule(17, 41, 15, 45, 1.4);
-    p.capsule(21, 31, 22, 37, 1.6);
-    p.capsule(22, 37, 20, 42, 1.6);
-    p.capsule(20, 42, 21, 46, 1.4);
-    p.capsule(27, 31, 26, 37, 1.6);
-    p.capsule(26, 37, 28, 42, 1.6);
-    p.capsule(28, 42, 27, 46, 1.4);
-    p.capsule(32, 30, 34, 36, 1.6);
-    p.capsule(34, 36, 31, 41, 1.6);
-    p.capsule(31, 41, 33, 45, 1.4);
+    p.capsule(17, 31, 15, 38, 1.5);
+    p.capsule(15, 38, 17, 44, 1.5);
+    p.capsule(22, 31, 21, 38, 1.5);
+    p.capsule(21, 38, 22, 44, 1.5);
+    p.capsule(27, 31, 28, 38, 1.5);
+    p.capsule(28, 38, 26, 44, 1.5);
+    p.capsule(32, 31, 34, 38, 1.5);
+    p.capsule(34, 38, 32, 44, 1.5);
     p.ellipse(24, 23, 14, 12);
-    p.ellipse(24, 31, 14, 3.5);
-    p.ellipse(16, 27, 2.2, 1.6, 'A');
-    p.ellipse(32, 27, 2.2, 1.6, 'A');
-    p.eye(19, 22, 2.6, 3.2);
-    p.eye(29, 22, 2.6, 3.2);
+    p.ellipse(24, 31, 14, 3);
+    p.ellipse(17, 26, 2.4, 1.6, 'A');
+    p.ellipse(31, 26, 2.4, 1.6, 'A');
+    p.eye(19, 22, 2.8, 3.4);
+    p.eye(29, 22, 2.8, 3.4);
+    p.arc(24, 28, 2, 0.8);
   },
   // 泡泡龙：圆身侧鳍 + 头顶泡泡
   dragon(p) {
-    p.capsule(35, 35, 44, 28, 3);
-    p.ellipse(14, 42, 5, 3);
-    p.ellipse(34, 42, 5, 3);
-    p.ellipse(24, 31, 13, 12);
-    p.ellipse(14, 30, 3.5, 5, 'A');
-    p.ellipse(34, 30, 3.5, 5, 'A');
-    p.tri(11, 27, 2, 19, 10, 37, 'A');
-    p.tri(37, 27, 46, 19, 38, 37, 'A');
-    p.ellipse(24, 37, 7, 4.5, 'A');
-    p.tri(22, 20, 24, 13, 26, 20, 'A');
-    p.eye(19, 27, 2.6, 3.2);
-    p.eye(29, 27, 2.6, 3.2);
-    p.arc(24, 33, 3, 1.2);
-    p.ellipse(38, 11, 3, 3, 'w');
-    p.ellipse(43, 5, 2, 2, 'w');
+    p.capsule(36, 36, 44, 30, 3);
+    p.ellipse(14, 43, 5, 3);
+    p.ellipse(34, 43, 5, 3);
+    p.tri(12, 28, 2, 20, 10, 38, 'A');
+    p.tri(36, 28, 46, 20, 38, 38, 'A');
+    p.tri(24, 17, 21, 9, 27, 17, 'A');
+    p.ellipse(24, 33, 13, 11);
+    p.ellipse(24, 38, 7, 4, 'A');
+    p.eye(19, 30, 2.8, 3.4);
+    p.eye(29, 30, 2.8, 3.4);
+    p.arc(24, 35, 2.5, 1);
+    p.ellipse(40, 12, 3, 3, 'w');
+    p.ellipse(44, 6, 2, 2, 'w');
   },
   // 雷电鼠：大圆耳 + 腮红 + 卷尾
   mouse(p) {
-    p.capsule(34, 37, 42, 41, 1.5);
-    p.ellipse(14, 42, 4, 3);
-    p.ellipse(32, 42, 4, 3);
-    p.ellipse(24, 32, 12, 10);
-    p.ellipse(13, 13, 6.5, 6.5);
-    p.ellipse(35, 13, 6.5, 6.5);
-    p.ellipse(24, 21, 12, 10);
-    p.ellipse(13, 13, 3, 3, 'A');
-    p.ellipse(35, 13, 3, 3, 'A');
-    p.ellipse(16, 26, 2.6, 2, 'A');
-    p.ellipse(32, 26, 2.6, 2, 'A');
-    p.px(23, 25, 'e');
-    p.px(24, 25, 'e');
-    p.eye(19, 20, 2.6, 3.2);
-    p.eye(29, 20, 2.6, 3.2);
-    p.blush(15, 24);
-    p.blush(33, 24);
-    p.arc(24, 28, 2, 1);
+    p.ellipse(14, 43, 4, 3);
+    p.ellipse(32, 43, 4, 3);
+    p.capsule(33, 38, 41, 42, 1.4);
+    p.ellipse(24, 34, 10, 8);
+    p.ellipse(13, 12, 6.5, 6.5);
+    p.ellipse(35, 12, 6.5, 6.5);
+    p.ellipse(24, 21, 12, 11);
+    p.ellipse(13, 12, 3, 3, 'A');
+    p.ellipse(35, 12, 3, 3, 'A');
+    p.eye(19, 20, 2.8, 3.2);
+    p.eye(29, 20, 2.8, 3.2);
+    p.blush(15, 25);
+    p.blush(33, 25);
+    p.px(23, 26, 'e');
+    p.px(24, 26, 'e');
+    p.arc(24, 29, 2, 1);
   },
   // 云朵灵：三团云 + 飘浮
   cloud(p) {
-    p.ellipse(14, 27, 9, 9);
-    p.ellipse(24, 21, 11, 11);
-    p.ellipse(34, 27, 9, 9);
-    p.rect(9, 26, 32, 8);
-    p.ellipse(10, 31, 3, 3);
-    p.ellipse(38, 31, 3, 3);
-    p.px(10, 19, 'w');
-    p.px(11, 18, 'w');
-    p.eye(20, 27, 2.6, 3.2);
-    p.eye(28, 27, 2.6, 3.2);
-    p.blush(16, 31);
-    p.blush(32, 31);
-    p.arc(24, 32, 3, 1.2);
+    p.ellipse(12, 29, 9, 8);
+    p.ellipse(36, 29, 9, 8);
+    p.ellipse(24, 25, 11, 10);
+    p.rect(9, 28, 30, 7);
+    p.ellipse(24, 36, 12, 3);
+    p.px(38, 15, 'w');
+    p.px(39, 14, 'w');
+    p.eye(20, 29, 2.8, 3.2);
+    p.eye(28, 29, 2.8, 3.2);
+    p.blush(16, 33);
+    p.blush(32, 33);
+    p.arc(24, 34, 2.5, 1);
   },
   // 闪电鸟：双翼 + 尖喙 + 冠羽
   bird(p) {
-    p.capsule(24, 12, 26, 5, 2, 'A');
-    p.tri(22, 41, 26, 41, 24, 46, 'A');
-    p.ellipse(15, 42, 4, 3);
-    p.ellipse(33, 42, 4, 3);
-    p.ellipse(24, 31, 11, 10);
-    p.ellipse(15, 30, 3, 5, 'A');
-    p.ellipse(33, 30, 3, 5, 'A');
-    p.tri(14, 28, 2, 19, 13, 37, 'A');
-    p.tri(34, 28, 46, 19, 35, 37, 'A');
-    p.ellipse(24, 20, 9, 8);
-    p.tri(24, 21, 24, 27, 30, 24, 'A');
-    p.eye(21, 18, 2.4, 3);
-    p.eye(27, 18, 2.4, 3);
+    p.ellipse(16, 43, 4, 3);
+    p.ellipse(32, 43, 4, 3);
+    p.tri(13, 30, 3, 22, 12, 38, 'A');
+    p.tri(35, 30, 45, 22, 36, 38, 'A');
+    p.ellipse(24, 34, 10, 9);
+    p.ellipse(24, 22, 10, 9);
+    p.capsule(24, 14, 25, 7, 1.8, 'A');
+    p.tri(24, 22, 24, 27, 31, 25, 'A');
+    p.eye(20, 21, 2.6, 3);
+    p.eye(28, 21, 2.6, 3);
+    p.blush(17, 26);
+    p.blush(31, 26);
   },
   // 暗影蝠：展开双翼 + 尖耳 + 獠牙
   bat(p) {
-    p.tri(14, 26, 2, 13, 3, 32);
-    p.tri(14, 26, 3, 32, 12, 37);
-    p.tri(34, 26, 46, 13, 45, 32);
-    p.tri(34, 26, 45, 32, 36, 37);
-    p.ellipse(15, 28, 3.5, 6);
-    p.ellipse(33, 28, 3.5, 6);
-    p.ellipse(24, 31, 10, 11);
-    p.ellipse(16, 42, 3, 2);
-    p.ellipse(32, 42, 3, 2);
-    p.tri(17, 18, 16, 6, 24, 17);
-    p.tri(31, 18, 32, 6, 24, 17);
+    p.tri(16, 27, 1, 12, 4, 34);
+    p.tri(4, 34, 16, 27, 11, 38);
+    p.tri(32, 27, 47, 12, 44, 34);
+    p.tri(44, 34, 32, 27, 37, 38);
+    p.ellipse(16, 43, 4, 3);
+    p.ellipse(32, 43, 4, 3);
+    p.tri(16, 19, 15, 6, 24, 17);
+    p.tri(32, 19, 33, 6, 24, 17);
+    p.ellipse(24, 31, 11, 12);
     p.ellipse(24, 23, 10, 8);
-    p.eye(20, 22, 2.4, 2.8);
-    p.eye(28, 22, 2.4, 2.8);
-    p.px(22, 27, 'w');
-    p.px(26, 27, 'w');
+    p.eye(20, 22, 2.6, 3);
+    p.eye(28, 22, 2.6, 3);
+    p.px(22, 28, 'w');
+    p.px(26, 28, 'w');
+    p.arc(24, 27, 1.5, 0.6);
   },
   // 梦灵：光球 + 星芒 + 眯眼
   dream(p) {
+    p.ellipse(13, 40, 4, 3);
+    p.ellipse(35, 40, 4, 3);
     p.ellipse(24, 27, 13, 13);
-    p.ellipse(17, 39, 4, 3);
-    p.ellipse(31, 39, 4, 3);
-    p.px(37, 14, 'w');
+    p.arc(19, 26, 3, -1.6);
+    p.arc(29, 26, 3, -1.6);
+    p.blush(16, 31);
+    p.blush(32, 31);
+    p.arc(24, 33, 3, 1);
     p.px(38, 13, 'w');
-    p.px(11, 17, 'w');
-    p.arc(20, 26, 2.5, -1.4);
-    p.arc(28, 26, 2.5, -1.4);
-    p.blush(17, 31);
-    p.blush(31, 31);
-    p.arc(24, 31, 2, 1);
+    p.px(39, 12, 'w');
+    p.px(10, 17, 'w');
   },
   // 幽灵种：圆头 + 波浪下摆
   ghost(p) {
-    p.ellipse(8, 32, 4, 5);
-    p.ellipse(40, 32, 4, 5);
-    p.ellipse(24, 26, 13, 13);
-    p.rect(11, 26, 26, 12);
+    p.ellipse(8, 31, 4, 5);
+    p.ellipse(40, 31, 4, 5);
+    p.ellipse(24, 26, 14, 13);
+    p.rect(10, 27, 28, 10);
     // 下摆缺口
-    for (let x = 11; x <= 36; x++) {
-      if ((x - 11) % 5 < 2) {
-        for (let y = 34; y <= 41; y++) p.px(x, y, EMPTY);
+    for (let x = 10; x <= 37; x++) {
+      if ((x - 10) % 6 < 2) {
+        for (let y = 36; y <= 41; y++) p.px(x, y, EMPTY);
       }
     }
-    p.eye(20, 25, 3, 3.4);
-    p.eye(28, 25, 3, 3.4);
-    p.ellipse(24, 31, 2, 1.4, 'e');
+    p.eye(19, 25, 3, 3.6);
+    p.eye(29, 25, 3, 3.6);
+    p.blush(15, 30);
+    p.blush(33, 30);
+    p.ellipse(24, 31, 1.6, 1.2, 'e');
   },
 };
 
 // 每只精灵的点缀色
 const ACCENTS = {
-  blob: '#86efac', mushroom: '#dc2626', leafy: '#6ee7b7',
-  fox: '#fbbf24', lavablob: '#fef08a', spark: '#fef9c3',
-  frog: '#dbeafe', jelly: '#e0f2fe', dragon: '#38bdf8',
-  mouse: '#facc15', cloud: '#e0e7ff', bird: '#fbbf24',
+  blob: '#86efac', mushroom: '#e35d5d', leafy: '#6ee7b7',
+  fox: '#fbbf24', lavablob: '#ffd166', spark: '#fff3b0',
+  frog: '#bfe3ff', jelly: '#dcefff', dragon: '#4cc9f0',
+  mouse: '#facc15', cloud: '#e6ecff', bird: '#ffd166',
   bat: '#c084fc', dream: '#c4b5fd', ghost: '#f5f3ff',
 };
 
@@ -403,8 +405,6 @@ function renderPixelArt(pet) {
   const body = pet.bodyColor;
   const shade = pet.shadowColor;
   const accent = ACCENTS[pet.shape] ?? lighten(body, 0.3);
-  // 藏青描边：更接近宝可梦卡通的彩色墨线
-  const outline = mix(darken(shade, 0.6), '#2f2b4a', 0.6);
 
   // 包围盒（用于左上来光的方向渐变）
   let minX = G, maxX = 0, minY = G, maxY = 0;
@@ -453,7 +453,7 @@ function renderPixelArt(pet) {
           }
         }
         if (near) {
-          ctx.fillStyle = outline;
+          ctx.fillStyle = INK;
           ctx.fillRect(x, y, 1, 1);
         }
         continue;
@@ -463,28 +463,24 @@ function renderPixelArt(pet) {
       const u = ((x - minX) / spanX + (y - minY) / spanY) / 2;
       let color;
       if (ch === 'e') {
-        color = '#171423';
+        color = '#201c33';
       } else if (ch === 'w') {
-        color = u > 0.82 ? '#e9e5d6' : '#fffdf5';
+        color = '#fffdf8';
       } else if (ch === 'a') {
         color = accent;
       } else if (ch === 'k') {
-        color = '#ff9ab2'; // 腮红
+        color = '#ffb3c7';
       } else {
         const base = ch === 'A' ? accent : body;
         const dark = ch === 'A' ? darken(accent, 0.18) : shade;
-        // 4 阶明暗，交界处用棋盘格抖动，贴近 GBA 像素画
-        const cols = [lighten(base, 0.34), base, dark, darken(dark, 0.32)];
-        const bands = [0.18, 0.56, 0.84];
-        let bi = 0;
-        while (bi < 3 && u >= bands[bi]) bi++;
-        color = cols[bi];
-        const even = ((x + y) & 1) === 0;
-        if (bi < 3 && bands[bi] - u < 0.05 && even) color = cols[bi + 1];
-        if (bi > 0 && u - bands[bi - 1] < 0.05 && !even) color = cols[bi - 1];
-        if (y === topY[x]) color = lighten(base, 0.55);              // 顶部轮廓光
-        // 轮廓内缘压暗，强化剪影
-        if (y !== topY[x] && isEdge(x, y)) color = mix(color, outline, 0.5);
+        const hi = lighten(base, 0.30);
+        const lo = darken(dark, 0.10);
+        // 三阶平涂：亮 / 本体 / 暗
+        color = u < 0.32 ? hi : (u > 0.70 ? lo : base);
+        // 顶部 2px 轮廓光
+        if (y - topY[x] < 2) color = lighten(base, 0.46);
+        // 内缘压暗，强化剪影
+        if (y - topY[x] >= 2 && isEdge(x, y)) color = mix(color, INK, 0.32);
       }
 
       ctx.fillStyle = color;
@@ -500,7 +496,7 @@ export function createSpriteEl(pet) {
   root.className = 'sprite-unit';
   root.dataset.petId = pet.id;
   root.style.cssText = `
-    position: absolute; width: 120px; height: 144px;
+    position: absolute; width: 104px; height: 118px;
     transform: translate(-50%, -50%);
     image-rendering: pixelated;
     pointer-events: auto; cursor: pointer;
@@ -508,27 +504,26 @@ export function createSpriteEl(pet) {
   `;
   root.style.animationDelay = -(Math.random() * 3).toFixed(2) + 's';
 
-  // 地板投影
+  // 地板投影：与精灵同宽 52%，不随浮动位移
   const shadow = document.createElement('div');
-  shadow.style.cssText = `position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
-    width:72px;height:12px;background:#2f2b4a;border-radius:50%;opacity:0.2;`;
+  shadow.style.cssText = `position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+    width:54px;height:9px;background:#2f2b4a;border-radius:50%;opacity:0.16;`;
   root.appendChild(shadow);
 
-  // 待机浮动
+  // 待机浮动（内层，避免覆盖定位 transform）
   const bob = document.createElement('div');
   bob.className = 'sprite-bob';
-  bob.style.cssText = 'position:absolute;bottom:16px;left:50%;transform:translateX(-50%);';
+  bob.style.cssText = 'position:absolute;bottom:9px;left:50%;transform:translateX(-50%);';
   bob.style.animationDelay = -(Math.random() * 2.6).toFixed(2) + 's';
   const cv = renderPixelArt(pet);
-  cv.style.cssText = `display:block;height:120px;width:auto;image-rendering:pixelated;
-    filter:drop-shadow(0 3px 0 rgba(47,43,74,0.28));`;
+  cv.style.cssText = `display:block;height:104px;width:auto;image-rendering:pixelated;`;
   bob.appendChild(cv);
   root.appendChild(bob);
 
   if (pet.evolved) {
     const star = document.createElement('div');
-    star.style.cssText = `position:absolute;top:2px;right:8px;font-size:12px;color:#fde047;
-      text-shadow:0 0 6px #f59e0b;z-index:12;`;
+    star.style.cssText = `position:absolute;top:0;right:10px;font-size:11px;color:#f5a524;
+      text-shadow:0 0 0 #2f2b4a;z-index:12;`;
     star.textContent = '✦';
     root.appendChild(star);
   }

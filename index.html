@@ -9,15 +9,36 @@
 </head>
 <body>
 <div id="app">
-  <!-- 顶部 HUD Grid (方案 C) -->
+  <!-- 顶部 HUD -->
   <header id="hud-top" class="hud-top">
     <div class="hud-row-1">
-      <span id="scene-name" class="hud-scene">▲ FOREST</span>
-      <span id="battery" class="hud-batt">BATT●●●●</span>
+      <span id="scene-name" class="hud-scene">FOREST</span>
       <span id="clock" class="hud-clock">--:--</span>
-      <button id="btn-hatch" class="hud-icon" title="孵化">🥚<span id="egg-count">0</span></button>
-      <button id="btn-codex" class="hud-icon" title="图鉴">📖</button>
-      <button id="btn-mute" class="hud-icon" title="音乐开关">🔊</button>
+      <div class="hud-actions">
+        <button id="btn-hatch" class="hud-icon" title="孵化">
+          <svg viewBox="0 0 12 12" class="ico" aria-hidden="true">
+            <ellipse cx="6" cy="6.6" rx="3.5" ry="4.4" fill="#ffd166" stroke="#2f2b4a" stroke-width="1.2"/>
+            <rect x="4" y="4" width="1" height="1" fill="#fffdf8"/>
+            <rect x="7" y="6" width="1" height="1" fill="#fffdf8"/>
+            <rect x="5" y="8" width="1" height="1" fill="#fffdf8"/>
+          </svg><span id="egg-count">0</span>
+        </button>
+        <button id="btn-codex" class="hud-icon" title="图鉴">
+          <svg viewBox="0 0 12 12" class="ico" aria-hidden="true">
+            <rect x="2" y="2" width="8" height="8" fill="#7ed6a0" stroke="#2f2b4a" stroke-width="1.2"/>
+            <rect x="5" y="2" width="1" height="8" fill="#2f2b4a"/>
+            <rect x="3" y="4" width="2" height="1" fill="#fffdf8"/>
+            <rect x="7" y="4" width="2" height="1" fill="#fffdf8"/>
+          </svg>
+        </button>
+        <button id="btn-mute" class="hud-icon" title="音乐开关">
+          <svg viewBox="0 0 12 12" class="ico" aria-hidden="true">
+            <rect x="2" y="4" width="3" height="4" fill="#ff8fab" stroke="#2f2b4a" stroke-width="1.2"/>
+            <path d="M5 4l3-2v8l-3-2z" fill="#ff8fab" stroke="#2f2b4a" stroke-width="1.2"/>
+            <rect x="9" y="4" width="1" height="4" fill="#2f2b4a"/>
+          </svg>
+        </button>
+      </div>
     </div>
     <div id="hud-pets" class="hud-pets-row"></div>
     <div id="scene-tabs" class="scene-tabs"></div>
@@ -32,11 +53,21 @@
 
   <!-- 底部 5 按钮快捷栏 -->
   <nav id="quick-bar" class="quick-bar">
-    <button class="qb-btn" data-action="feed">🍖<span>喂食</span></button>
-    <button class="qb-btn" data-action="play">🎾<span>玩耍</span></button>
-    <button class="qb-btn" data-action="clean">🧼<span>清洁</span></button>
-    <button class="qb-btn qb-ai" data-action="talk">💬<span>对话</span></button>
-    <button class="qb-btn" data-action="walk">▶<span>散步</span></button>
+    <button class="qb-btn" data-action="feed"><span class="qb-ico">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><ellipse cx="7.4" cy="7.4" rx="3.1" ry="3.1" fill="#e8875e" stroke="#2f2b4a" stroke-width="1.2"/><rect x="1.6" y="1.6" width="4" height="2" rx="1" fill="#fffdf8" stroke="#2f2b4a" stroke-width="1.2" transform="rotate(45 3.6 2.6)"/></svg>
+    </span><span>喂食</span></button>
+    <button class="qb-btn" data-action="play"><span class="qb-ico">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4.2" fill="#fffdf8" stroke="#2f2b4a" stroke-width="1.2"/><path d="M6 2v8M2 6h8" stroke="#2f9e8f" stroke-width="1.2"/></svg>
+    </span><span>玩耍</span></button>
+    <button class="qb-btn" data-action="clean"><span class="qb-ico">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="5" width="8" height="5" rx="1" fill="#8fd8ff" stroke="#2f2b4a" stroke-width="1.2"/><circle cx="4" cy="3" r="1.2" fill="#fffdf8" stroke="#2f2b4a" stroke-width="1"/><circle cx="7" cy="2.4" r="1" fill="#fffdf8" stroke="#2f2b4a" stroke-width="1"/></svg>
+    </span><span>清洁</span></button>
+    <button class="qb-btn qb-ai" data-action="talk"><span class="qb-ico">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2h8v6H6l-2 2V8H2z" fill="#fffdf8" stroke="#2f2b4a" stroke-width="1.2"/><rect x="4" y="4" width="1" height="1" fill="#2f2b4a"/><rect x="6" y="4" width="1" height="1" fill="#2f2b4a"/><rect x="8" y="4" width="1" height="1" fill="#2f2b4a"/></svg>
+    </span><span>对话</span></button>
+    <button class="qb-btn" data-action="walk"><span class="qb-ico">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><ellipse cx="4.2" cy="4" rx="1.5" ry="2.2" fill="#2f9e8f" stroke="#2f2b4a" stroke-width="1"/><ellipse cx="7.8" cy="8" rx="1.5" ry="2.2" fill="#2f9e8f" stroke="#2f2b4a" stroke-width="1"/></svg>
+    </span><span>散步</span></button>
   </nav>
 
   <!-- 状态 toast -->
@@ -45,7 +76,7 @@
   <!-- 对话弹窗 -->
   <div id="chat-modal" class="modal hidden">
     <div class="modal-panel chat-panel">
-      <div class="modal-title" id="chat-title">💬 对话</div>
+      <div class="modal-title" id="chat-title">对话</div>
       <div id="chat-log" class="chat-log"></div>
       <div class="chat-input-row">
         <input id="chat-input" type="text" maxlength="60" placeholder="说点什么..." autocomplete="off">
@@ -70,7 +101,7 @@
   <!-- 图鉴弹窗 -->
   <div id="codex-modal" class="modal hidden">
     <div class="modal-panel">
-      <div class="modal-title">▲ 精灵图鉴</div>
+      <div class="modal-title">精灵图鉴</div>
       <div id="codex-grid" class="codex-grid"></div>
       <button id="codex-close" class="modal-close">✕</button>
     </div>
