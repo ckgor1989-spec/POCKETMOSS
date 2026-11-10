@@ -174,7 +174,7 @@ class PocketMossGame {
         <div class="bar"><div style="background:#60a5fa;width:${pet.clean.toFixed(0)}%;"></div></div>
         <div class="bar"><div style="background:#f472b6;width:${pet.affection.toFixed(0)}%;"></div></div>
       `;
-      chip.querySelector('.avatar').appendChild(this.avatarEl(pet, 16));
+      chip.querySelector('.avatar').appendChild(this.avatarEl(pet, 20));
       chip.addEventListener('click', () => {
         this.selectedPetId = pet.id;
         this.renderHudChips();
@@ -383,7 +383,7 @@ class PocketMossGame {
         <div class="hc-name">${def.name}</div>
         <div class="hc-pers">${def.personality}</div>
       `;
-      card.querySelector('.hc-avatar').appendChild(this.avatarEl(def, 34));
+      card.querySelector('.hc-avatar').appendChild(this.avatarEl(def, 40));
       card.addEventListener('click', () => {
         const pet = hatchPet(this.game, spriteId);
         document.getElementById('hatch-modal').classList.add('hidden');
@@ -420,7 +420,7 @@ class PocketMossGame {
         <div class="cc-aff">${owned ? `${def.personality} · 好感 ${Math.round(pet.affection)} · ${pet.impressionLevel}` : ELEMENTS[def.element].name}</div>
       `;
       const av = cell.querySelector('.cc-avatar');
-      if (owned) av.appendChild(this.avatarEl(pet, 26));
+      if (owned) av.appendChild(this.avatarEl(pet, 32));
       else av.textContent = '?';
       grid.appendChild(cell);
     });

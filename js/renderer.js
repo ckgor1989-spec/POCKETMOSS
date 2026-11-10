@@ -513,7 +513,10 @@ export class SceneRenderer {
       const t = depths[i];
       const horizon = H * 0.58;
       const groundBot = H - 10;
-      const y = horizon + (groundBot - horizon) * t;
+      const scale = 0.62 + t * 0.62;
+      const halfH = 56 * scale; // 容器高 112px 的一半（缩放后）
+      // 精灵变大后必须夹住底边，避免被场景裁掉下半身
+      const y = Math.min(horizon + (groundBot - horizon) * t, H - halfH - 6);
       const jitter = (Math.random() - 0.5) * 0.15;
       const baseX = 0.5 + (i - (n - 1) / 2) * 0.14;
       const x = W * clamp(baseX + jitter, 0.1, 0.9);
@@ -522,6 +525,6 @@ export class SceneRenderer {
     return positions.sort((a, b) => a.depth - b.depth);
   }
 
-  /** depth 0 → 0.55 倍, depth 1 → 1.1 倍 */
-  static depthToScale(depth) { return 0.55 + depth * 0.55; }
+  /** depth 0 → 0.62 倍, depth 1 → 1.24 倍 */
+  static depthToScale(depth) { return 0.62 + depth * 0.62; }
 }

@@ -30,7 +30,7 @@ body {
     to bottom, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1px,
     transparent 1px, transparent 3px
   );
-  mix-blend-mode: multiply; opacity: 0.5;
+  mix-blend-mode: multiply; opacity: 0.34;
 }
 
 /* ===== 顶部 HUD ===== */
@@ -63,7 +63,7 @@ body {
 }
 .hud-pet-chip .name { font-size: 9px; color: var(--gba-bg); text-align: center; letter-spacing: 0; }
 .hud-pet-chip .avatar {
-  width: 18px; height: 18px; margin: 0 auto;
+  width: 20px; height: 20px; margin: 0 auto;
   display: flex; align-items: center; justify-content: center;
 }
 .hud-pet-chip .bar { height: 4px; background: #101710; border: 1px solid #050805; }
@@ -91,7 +91,7 @@ body {
   50%      { transform: translate(-50%, -3px); }
 }
 .sprite-bob {
-  position: absolute; bottom: 6px; left: 50%;
+  position: absolute; bottom: 12px; left: 50%;
   transform: translate(-50%, 0);
   animation: sprite-bob 2.6s ease-in-out infinite;
 }
@@ -270,7 +270,7 @@ body {
 .hatch-card:active { background: var(--gba-mid); transform: translateY(2px); box-shadow: 0 1px 0 #0a0f0a; }
 .hatch-card:hover { border-color: var(--gba-bg); }
 .hatch-card .hc-avatar {
-  width: 36px; height: 36px; margin: 0 auto 6px; position: relative;
+  width: 42px; height: 42px; margin: 0 auto 6px; position: relative;
   display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle, rgba(139,172,15,0.18), transparent 70%);
 }
@@ -289,7 +289,7 @@ body {
 .codex-cell.owned { border-color: var(--gba-light); background: #16200f; }
 .codex-cell.owned:hover { box-shadow: 0 0 8px rgba(155,188,15,0.4); }
 .codex-cell .cc-avatar {
-  width: 32px; height: 32px; margin: 0 auto 4px; border-radius: 2px;
+  width: 34px; height: 34px; margin: 0 auto 4px; border-radius: 2px;
   display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle, rgba(155,188,15,0.14), transparent 72%);
   font-size: 14px; color: #3f4a3f;
