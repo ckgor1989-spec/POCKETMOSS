@@ -311,10 +311,10 @@ export const L2_REACTIONS = {
   },
 };
 
-// ===== AI 可配置接口（留接口，未接服务时自动降级 L1/L2 本地） =====
+// ===== AI 接口（DeepSeek，OpenAI 兼容格式） =====
 export const AI_CONFIG = {
-  endpoint: '',
-  apiKey: '',
-  defaultModel: '',
-  enabled: false,
+  endpoint: 'https://api.deepseek.com/chat/completions',
+  apiKey: '',           // ← 填入你的 DeepSeek API Key
+  defaultModel: 'deepseek-chat',
+  enabled: false,       // 填入 Key 后改为 true 即启用 L3 深度对话
 };
