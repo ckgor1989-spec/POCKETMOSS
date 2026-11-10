@@ -41,6 +41,19 @@
   <!-- 状态 toast -->
   <div id="toast" class="toast"></div>
 
+  <!-- 对话弹窗 -->
+  <div id="chat-modal" class="modal hidden">
+    <div class="modal-panel chat-panel">
+      <div class="modal-title" id="chat-title">💬 对话</div>
+      <div id="chat-log" class="chat-log"></div>
+      <div class="chat-input-row">
+        <input id="chat-input" type="text" maxlength="60" placeholder="说点什么..." autocomplete="off">
+        <button id="chat-send" class="chat-send">➤</button>
+      </div>
+      <button id="chat-close" class="modal-close">✕</button>
+    </div>
+  </div>
+
   <!-- 孵化弹窗 -->
   <div id="hatch-modal" class="modal hidden">
     <div class="modal-panel">

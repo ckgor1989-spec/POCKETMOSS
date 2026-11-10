@@ -2,6 +2,7 @@ import { loadGame, saveGame, resetSave } from './storage.js';
 import { SceneRenderer } from './renderer.js';
 import { createSpriteEl } from './sprites.js';
 import { doInteraction, doWalk, rollHatchChoices, hatchPet, pickRandomActivePet } from './interactions.js';
+import { chatWithPet, routeDialog } from './ai.js';
 import { SCENES, SPRITES, ELEMENTS } from './config.js';
 
 // 调试便捷：挂到 window
@@ -17,6 +18,8 @@ class PocketMossGame {
     this.renderer = new SceneRenderer(this.canvas, this.petLayer);
     this.selectedPetId = null;
     this.pendingHatch = null; // { element, choices }
+    this.chatPetId = null;    // 当前聊天对象
+    this.chatHistories = {};  // petId -> [{role, content}]（内存态，不进存档）
     this.lastTick = Date.now();
     this.initHud();
     this.bindEvents();
@@ -94,7 +97,7 @@ class PocketMossGame {
         e.stopPropagation();
         this.selectedPetId = pet.id;
         this.renderHudChips();
-        this.onQuickAction('talk');
+        this.quickTalk(pet); // 点精灵 = 快速一句
       });
       this.petLayer.appendChild(el);
     });
@@ -118,7 +121,7 @@ class PocketMossGame {
       chip.addEventListener('click', () => {
         this.selectedPetId = pet.id;
         this.renderHudChips();
-        this.onQuickAction('talk');
+        this.quickTalk(pet);
       });
       row.appendChild(chip);
     });
@@ -142,6 +145,12 @@ class PocketMossGame {
     document.getElementById('codex-close').addEventListener('click', () => {
       document.getElementById('codex-modal').classList.add('hidden');
     });
+    // 对话面板
+    document.getElementById('chat-close').addEventListener('click', () => this.closeChat());
+    document.getElementById('chat-send').addEventListener('click', () => this.sendChat());
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') this.sendChat();
+    });
   }
 
   async onQuickAction(action) {
@@ -160,6 +169,12 @@ class PocketMossGame {
       return;
     }
 
+    // 💬 对话按钮 = 打开多轮聊天面板
+    if (action === 'talk') {
+      this.openChat(pet);
+      return;
+    }
+
     const result = await doInteraction(this.game, petId, action);
     if (result) {
       this.showBubble(result.pet, result.text);
@@ -168,6 +183,81 @@ class PocketMossGame {
       this.renderScene();
       this.showToast(actionToast(action, result.pet));
     }
+  }
+
+  /** 点精灵/头像：快速一句（不进聊天面板） */
+  async quickTalk(pet) {
+    const result = await doInteraction(this.game, pet.id, 'talk');
+    if (result) {
+      this.showBubble(result.pet, result.text);
+      if (result.evolved) this.announceEvolve(result.pet);
+      this.renderHudChips();
+    }
+  }
+
+  // ===== 多轮对话面板 =====
+  openChat(pet) {
+    this.chatPetId = pet.id;
+    document.getElementById('chat-title').textContent =
+      `💬 ${pet.name} · ${pet.personality}`;
+    this.renderChatLog();
+    document.getElementById('chat-modal').classList.remove('hidden');
+    const input = document.getElementById('chat-input');
+    input.value = '';
+    setTimeout(() => input.focus(), 50);
+  }
+
+  closeChat() {
+    document.getElementById('chat-modal').classList.add('hidden');
+    this.chatPetId = null;
+  }
+
+  renderChatLog() {
+    const log = document.getElementById('chat-log');
+    log.innerHTML = '';
+    const history = this.chatHistories[this.chatPetId] ?? [];
+    if (history.length === 0) {
+      const sys = document.createElement('div');
+      sys.className = 'chat-msg sys';
+      sys.textContent = '和它说点什么吧';
+      log.appendChild(sys);
+    }
+    history.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + (m.role === 'user' ? 'me' : 'pet');
+      div.textContent = m.content;
+      log.appendChild(div);
+    });
+    log.scrollTop = log.scrollHeight;
+  }
+
+  async sendChat() {
+    const pet = this.game.pets[this.chatPetId];
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send');
+    const text = input.value.trim();
+    if (!pet || !text) return;
+
+    const history = this.chatHistories[pet.id] ?? (this.chatHistories[pet.id] = []);
+    history.push({ role: 'user', content: text });
+    input.value = '';
+    sendBtn.disabled = true;
+    this.renderChatLog();
+
+    // L3 多轮对话；API 失败时降级 L1 本地台词，保证有回应
+    let reply = await chatWithPet(pet, history.slice(0, -1), text);
+    if (!reply) reply = await routeDialog('L1', pet, 'idle');
+    history.push({ role: 'assistant', content: reply });
+
+    // 聊天也算互动：小幅涨心情和好感
+    pet.applyChange({ mood: +2, affection: +2 });
+    if (pet.tryEvolve()) this.announceEvolve(pet);
+    saveGame(this.game);
+
+    sendBtn.disabled = false;
+    this.renderChatLog();
+    this.renderHudChips();
+    input.focus();
   }
 
   announceEvolve(pet) {
