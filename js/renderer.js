@@ -95,12 +95,73 @@ export class SceneRenderer {
   drawDecor(scene, timeOfDay) {
     const { W, H } = this;
     const c = scene.colors;
+    const key = scene.key;
+
+    if (key === 'cavern') {
+      // 洞穴：无太阳，顶部垂下钟乳石 + 发光水晶
+      this.ctx.fillStyle = c.groundDark;
+      for (let i = 0; i < 5; i++) {
+        const x = W * (0.1 + i * 0.2);
+        const len = 14 + (i % 3) * 8;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x - 6, 0); this.ctx.lineTo(x + 6, 0); this.ctx.lineTo(x, len);
+        this.ctx.closePath(); this.ctx.fill();
+      }
+      this.ctx.fillStyle = c.accent;
+      [[0.2, 0.4], [0.7, 0.35], [0.45, 0.48]].forEach(([fx, fy]) => {
+        this.ctx.beginPath();
+        this.ctx.moveTo(W * fx, H * fy - 6);
+        this.ctx.lineTo(W * fx + 4, H * fy);
+        this.ctx.lineTo(W * fx, H * fy + 6);
+        this.ctx.lineTo(W * fx - 4, H * fy);
+        this.ctx.closePath(); this.ctx.fill();
+      });
+      return;
+    }
+
     // 太阳 / 月亮
     this.ctx.fillStyle = timeOfDay === 'night' ? '#e5e7eb' : c.accent;
     this.ctx.beginPath();
     this.ctx.arc(W * 0.85, H * 0.12, 10, 0, Math.PI * 2);
     this.ctx.fill();
-    // 云 / 雾
+
+    if (key === 'volcano') {
+      // 火山：远处火山剪影 + 漂浮火星
+      this.ctx.fillStyle = c.groundDark;
+      this.ctx.beginPath();
+      this.ctx.moveTo(W * 0.05, H * 0.55);
+      this.ctx.lineTo(W * 0.3, H * 0.3);
+      this.ctx.lineTo(W * 0.55, H * 0.55);
+      this.ctx.closePath(); this.ctx.fill();
+      this.ctx.fillStyle = '#fb923c';
+      [[0.25, 0.4], [0.5, 0.3], [0.65, 0.45], [0.15, 0.25]].forEach(([fx, fy]) => {
+        this.ctx.fillRect(W * fx, H * fy, 3, 3);
+      });
+      return;
+    }
+
+    if (key === 'lake') {
+      // 湖泊：太阳倒影 + 云朵
+      this.ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      this.ctx.beginPath();
+      this.ctx.ellipse(W * 0.85, H * 0.53, 14, 3, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+
+    if (key === 'peak') {
+      // 雷峰：闪电符号
+      this.ctx.fillStyle = '#fde047';
+      this.ctx.beginPath();
+      this.ctx.moveTo(W * 0.2, H * 0.06);
+      this.ctx.lineTo(W * 0.23, H * 0.14);
+      this.ctx.lineTo(W * 0.2, H * 0.13);
+      this.ctx.lineTo(W * 0.24, H * 0.22);
+      this.ctx.lineTo(W * 0.22, H * 0.14);
+      this.ctx.lineTo(W * 0.25, H * 0.13);
+      this.ctx.closePath(); this.ctx.fill();
+    }
+
+    // 通用云 / 雾
     this.ctx.fillStyle = 'rgba(255,255,255,0.18)';
     this.ctx.beginPath();
     this.ctx.ellipse(W * 0.15, H * 0.18, 30, 8, 0, 0, Math.PI * 2);

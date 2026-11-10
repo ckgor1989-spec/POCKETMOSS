@@ -15,8 +15,11 @@
       <span id="scene-name" class="hud-scene">▲ FOREST</span>
       <span id="battery" class="hud-batt">BATT●●●●</span>
       <span id="clock" class="hud-clock">--:--</span>
+      <button id="btn-hatch" class="hud-icon" title="孵化">🥚<span id="egg-count">0</span></button>
+      <button id="btn-codex" class="hud-icon" title="图鉴">📖</button>
     </div>
     <div id="hud-pets" class="hud-pets-row"></div>
+    <div id="scene-tabs" class="scene-tabs"></div>
   </header>
 
   <!-- 2.5D 场景 Canvas + 精灵 DOM 层 + 对话气泡层 -->
@@ -37,6 +40,27 @@
 
   <!-- 状态 toast -->
   <div id="toast" class="toast"></div>
+
+  <!-- 孵化弹窗 -->
+  <div id="hatch-modal" class="modal hidden">
+    <div class="modal-panel">
+      <div id="hatch-stage">
+        <div id="hatch-egg" class="hatch-egg">🥚</div>
+        <div class="modal-hint">点击蛋孵化</div>
+      </div>
+      <div id="hatch-choices" class="hatch-choices hidden"></div>
+      <button id="hatch-close" class="modal-close">✕</button>
+    </div>
+  </div>
+
+  <!-- 图鉴弹窗 -->
+  <div id="codex-modal" class="modal hidden">
+    <div class="modal-panel">
+      <div class="modal-title">▲ 精灵图鉴</div>
+      <div id="codex-grid" class="codex-grid"></div>
+      <button id="codex-close" class="modal-close">✕</button>
+    </div>
+  </div>
 </div>
 <script type="module" src="js/game.js"></script>
 </body>

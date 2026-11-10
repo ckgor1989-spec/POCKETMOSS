@@ -1,37 +1,47 @@
-import { L1_LINES, AI_CONFIG } from './config.js';
+import { L1_LINES, L2_REACTIONS, AI_CONFIG } from './config.js';
 
 /**
  * 对话路由 —— 分层降级
  * @param {'L1'|'L2'|'L3'|'auto'} layer
  * @param {import('./state.js').PetState} pet
  * @param {string} context  idle / after_feed / after_play / after_clean / walk_event
+ * @param {object} extra    L2 散步事件时传 { tag }
  */
-export async function routeDialog(layer, pet, context = 'idle') {
+export async function routeDialog(layer, pet, context = 'idle', extra = {}) {
   if (layer === 'auto') layer = resolveLayer(context);
 
   switch (layer) {
-    case 'L1': return pickLine(pet, context);
-    case 'L2': return pickLine(pet, context); // Phase 2 剧本化 + API 润色
+    case 'L2': return pickWalkReaction(pet, extra.tag);
     case 'L3': return await callLLM(pet, context);
     default:   return pickLine(pet, context);
   }
 }
 
 function resolveLayer(context) {
-  if (AI_CONFIG.enabled) return 'L3'; // 有 API 配置就自动走 L3
-  return 'L1'; // MVP 默认 L1
+  if (context === 'walk_event') return 'L2'; // 散步事件 → 本地剧本化反应
+  if (AI_CONFIG.enabled) return 'L3';        // 配置了 API 才走 LLM
+  return 'L1';
 }
 
 /** 从 L1 台词库按 状态+性格 挑一句 */
 function pickLine(pet, context) {
-  const key = context === 'idle' ? pet.statusKey : `after_${context}`;
+  // context 直接命中台词库分组（after_feed 等）；idle/talk 用状态值
+  const key = (context === 'idle' || context === 'talk') ? pet.statusKey : context;
   const group = L1_LINES[key];
   if (!group) return '...';
   const lines = group.all ?? group[pet.personality] ?? Object.values(group)[0];
   return lines[Math.floor(Math.random() * lines.length)];
 }
 
-/** LLM 调用 —— Phase 3 接入，MVP 自动降级 */
+/** L2 散步事件反应：按 事件tag × 性格 挑一句；缺数据降级到 L1 */
+function pickWalkReaction(pet, tag) {
+  const group = L2_REACTIONS[tag];
+  if (!group) return pickLine(pet, 'idle');
+  const lines = group[pet.personality] ?? Object.values(group)[0];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+
+/** LLM 调用 —— 接口已留好，未配置时自动降级 */
 async function callLLM(pet, context) {
   if (!AI_CONFIG.enabled || !AI_CONFIG.endpoint) return pickLine(pet, context);
   const prompt = buildSystemPrompt(pet);

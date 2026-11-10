@@ -1,7 +1,8 @@
 import { loadGame, saveGame, resetSave } from './storage.js';
 import { SceneRenderer } from './renderer.js';
 import { createSpriteEl } from './sprites.js';
-import { doInteraction, pickRandomActivePet } from './interactions.js';
+import { doInteraction, doWalk, rollHatchChoices, hatchPet, pickRandomActivePet } from './interactions.js';
+import { SCENES, SPRITES, ELEMENTS } from './config.js';
 
 // 调试便捷：挂到 window
 window.resetSave = resetSave;
@@ -15,6 +16,7 @@ class PocketMossGame {
     this.bubbleLayer = document.getElementById('bubble-layer');
     this.renderer = new SceneRenderer(this.canvas, this.petLayer);
     this.selectedPetId = null;
+    this.pendingHatch = null; // { element, choices }
     this.lastTick = Date.now();
     this.initHud();
     this.bindEvents();
@@ -23,17 +25,58 @@ class PocketMossGame {
   }
 
   initHud() {
-    document.getElementById('scene-name').textContent =
-      `▲ ${this.game.scenes[this.game.currentScene].name.toUpperCase()}`;
+    this.updateSceneName();
     document.getElementById('battery').textContent = 'BATT●●●●';
     document.getElementById('clock').textContent = '--:--';
+    this.renderSceneTabs();
     this.renderScene();
   }
 
+  updateSceneName() {
+    document.getElementById('scene-name').textContent =
+      `▲ ${this.game.scenes[this.game.currentScene].name.toUpperCase()}`;
+  }
+
+  updateEggCount() {
+    document.getElementById('egg-count').textContent = String(this.game.eggs);
+  }
+
+  // ===== 场景 Tab =====
+  renderSceneTabs() {
+    const bar = document.getElementById('scene-tabs');
+    bar.innerHTML = '';
+    Object.keys(SCENES).forEach(key => {
+      const unlocked = this.game.sceneUnlocked(key);
+      const tab = document.createElement('button');
+      tab.className = 'scene-tab'
+        + (key === this.game.currentScene ? ' active' : '')
+        + (!unlocked ? ' locked' : '');
+      const el = SCENES[key].element;
+      const icons = { wood: '🌱', fire: '🔥', water: '💧', thunder: '⚡', shadow: '🌑' };
+      tab.textContent = unlocked ? `${icons[el]}${ELEMENTS[el].name.slice(0, 2)}` : '🔒???';
+      tab.addEventListener('click', () => {
+        if (!unlocked) return this.showToast('孵化对应元素的精灵后解锁');
+        this.switchScene(key);
+      });
+      bar.appendChild(tab);
+    });
+  }
+
+  switchScene(key) {
+    this.game.currentScene = key;
+    this.selectedPetId = null;
+    saveGame(this.game);
+    this.updateSceneName();
+    this.renderSceneTabs();
+    this.renderScene();
+  }
+
+  // ===== 场景渲染 =====
   renderScene() {
     const scene = this.game.scenes[this.game.currentScene];
     this.renderer.drawScene(scene);
     this.petLayer.innerHTML = '';
+    this.updateEggCount();
 
     const pets = this.game.activePets;
     const positions = this.renderer.computePetPositions(pets);
@@ -66,15 +109,16 @@ class PocketMossGame {
       chip.className = 'hud-pet-chip' + (pet.id === this.selectedPetId ? ' active' : '');
       chip.innerHTML = `
         <div class="avatar" style="background:${pet.bodyColor};"></div>
-        <div class="name">${pet.name}</div>
+        <div class="name">${pet.name}${pet.evolved ? '✦' : ''}</div>
         <div class="bar"><div style="background:#ef4444;width:${pet.hunger.toFixed(0)}%;"></div></div>
         <div class="bar"><div style="background:#fbbf24;width:${pet.mood.toFixed(0)}%;"></div></div>
         <div class="bar"><div style="background:#60a5fa;width:${pet.clean.toFixed(0)}%;"></div></div>
+        <div class="bar"><div style="background:#f472b6;width:${pet.affection.toFixed(0)}%;"></div></div>
       `;
       chip.addEventListener('click', () => {
         this.selectedPetId = pet.id;
         this.renderHudChips();
-        this.onQuickAction('talk'); // HUD chip 点击 = 主动对话
+        this.onQuickAction('talk');
       });
       row.appendChild(chip);
     });
@@ -82,32 +126,36 @@ class PocketMossGame {
 
   bindEvents() {
     document.querySelectorAll('.qb-btn').forEach(btn => {
-      const action = btn.dataset.action;
-      btn.addEventListener('click', () => this.onQuickAction(action));
+      btn.addEventListener('click', () => this.onQuickAction(btn.dataset.action));
     });
     document.getElementById('scene-wrap').addEventListener('click', () => {
       this.selectedPetId = null;
       this.clearBubble();
       this.renderHudChips();
     });
+    // 孵化
+    document.getElementById('btn-hatch').addEventListener('click', () => this.openHatch());
+    document.getElementById('hatch-close').addEventListener('click', () => this.closeHatch());
+    document.getElementById('hatch-egg').addEventListener('click', () => this.crackEgg());
+    // 图鉴
+    document.getElementById('btn-codex').addEventListener('click', () => this.openCodex());
+    document.getElementById('codex-close').addEventListener('click', () => {
+      document.getElementById('codex-modal').classList.add('hidden');
+    });
   }
 
   async onQuickAction(action) {
     const petId = this.selectedPetId ?? pickRandomActivePet(this.game)?.id;
     if (!petId) return this.showToast('这里没有精灵');
+    const pet = this.game.pets[petId];
+    if (!pet) return;
 
-    // 散步事件 —— Phase 2 扩展
     if (action === 'walk') {
-      const pet = this.game.pets[petId];
-      pet.applyChange({ hunger: -15, mood: +15 });
-      // 随机触发"遇到一件事" —— MVP 版本只是换个上下文
-      const events = ['找到了小果子！', '遇到了一只蝴蝶~', '看到了漂亮的花', '发现了一个神秘的洞...'];
-      const eventText = events[Math.floor(Math.random() * events.length)];
-      const { routeDialog } = await import('./ai.js');
-      const petText = await routeDialog('auto', pet, 'walk_event');
-      saveGame(this.game);
-      this.showBubble(pet, `${eventText} ${petText}`);
-      this.spawnParticles(pet);
+      const result = await doWalk(this.game, petId);
+      this.showBubble(result.pet, `${result.event.text}！${result.reaction}`);
+      this.spawnParticles(result.pet);
+      if (result.gotEgg) this.showToast('捡到了一颗蛋！🥚');
+      if (result.evolved) this.announceEvolve(result.pet);
       this.renderScene();
       return;
     }
@@ -116,11 +164,109 @@ class PocketMossGame {
     if (result) {
       this.showBubble(result.pet, result.text);
       this.spawnParticles(result.pet);
+      if (result.evolved) this.announceEvolve(result.pet);
       this.renderScene();
       this.showToast(actionToast(action, result.pet));
     }
   }
 
+  announceEvolve(pet) {
+    setTimeout(() => this.showToast(`✦ ${pet.name} 进化了！好感度 MAX`), 600);
+  }
+
+  // ===== 孵化 =====
+  openHatch() {
+    const modal = document.getElementById('hatch-modal');
+    const egg = document.getElementById('hatch-egg');
+    const stage = document.getElementById('hatch-stage');
+    const choices = document.getElementById('hatch-choices');
+    choices.classList.add('hidden');
+    choices.innerHTML = '';
+    stage.classList.remove('hidden');
+    egg.className = 'hatch-egg';
+    this.pendingHatch = null;
+    if (this.game.eggs <= 0) {
+      stage.querySelector('.modal-hint').textContent = '没有蛋了，散步时可能捡到';
+      egg.style.pointerEvents = 'none';
+    } else {
+      stage.querySelector('.modal-hint').textContent = `点击蛋孵化（剩 ${this.game.eggs} 颗）`;
+      egg.style.pointerEvents = 'auto';
+    }
+    modal.classList.remove('hidden');
+  }
+
+  crackEgg() {
+    if (this.pendingHatch) return; // 已经摇过
+    const result = rollHatchChoices(this.game);
+    if (!result) return this.showToast('没有可孵化的蛋');
+    this.pendingHatch = result;
+
+    const egg = document.getElementById('hatch-egg');
+    egg.classList.add('shaking');
+    setTimeout(() => {
+      egg.classList.remove('shaking');
+      egg.classList.add('hatched');
+      setTimeout(() => this.showHatchChoices(result), 400);
+    }, 1200);
+  }
+
+  showHatchChoices({ element, choices }) {
+    document.getElementById('hatch-stage').classList.add('hidden');
+    const box = document.getElementById('hatch-choices');
+    box.innerHTML = '';
+    box.classList.remove('hidden');
+    const elColor = ELEMENTS[element].color;
+    choices.forEach(spriteId => {
+      const def = SPRITES[spriteId];
+      const card = document.createElement('div');
+      card.className = 'hatch-card';
+      card.style.borderColor = elColor;
+      card.innerHTML = `
+        <div class="hc-avatar" style="background:${def.bodyColor};"></div>
+        <div class="hc-name">${def.name}</div>
+        <div class="hc-pers">${def.personality}</div>
+      `;
+      card.addEventListener('click', () => {
+        const pet = hatchPet(this.game, spriteId);
+        document.getElementById('hatch-modal').classList.add('hidden');
+        if (pet) {
+          const sceneKey = ELEMENTS[pet.element].sceneKey;
+          this.showToast(`${pet.name} 诞生了！`);
+          this.switchScene(sceneKey);
+          this.selectedPetId = pet.id;
+          setTimeout(() => this.showBubble(pet, '你好呀，新世界！'), 400);
+        }
+      });
+      box.appendChild(card);
+    });
+  }
+
+  closeHatch() {
+    document.getElementById('hatch-modal').classList.add('hidden');
+    this.pendingHatch = null;
+  }
+
+  // ===== 图鉴 =====
+  openCodex() {
+    const grid = document.getElementById('codex-grid');
+    grid.innerHTML = '';
+    Object.values(SPRITES).forEach(def => {
+      const owned = !!this.game.pets[def.id];
+      const pet = this.game.pets[def.id];
+      const cell = document.createElement('div');
+      cell.className = 'codex-cell ' + (owned ? 'owned' : 'locked');
+      const elColor = ELEMENTS[def.element].color;
+      cell.innerHTML = `
+        <div class="cc-avatar" style="background:${owned ? (pet.evolved ? SPRITES[def.id].evolved.bodyColor : def.bodyColor) : '#333'};border:1px solid ${elColor};"></div>
+        <div>${owned ? def.name : '???'}</div>
+        <div class="cc-aff">${owned ? `${def.personality} · 好感 ${Math.round(pet.affection)}` : ELEMENTS[def.element].name}</div>
+      `;
+      grid.appendChild(cell);
+    });
+    document.getElementById('codex-modal').classList.remove('hidden');
+  }
+
+  // ===== 气泡 / 粒子 / Toast =====
   showBubble(pet, text) {
     this.clearBubble();
     const bubble = document.createElement('div');

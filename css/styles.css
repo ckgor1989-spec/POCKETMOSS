@@ -123,3 +123,85 @@ body {
   opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200;
 }
 .toast.show { opacity: 1; }
+
+/* ===== HUD 图标按钮（蛋/图鉴） ===== */
+.hud-icon {
+  background: #1a1a1a; border: 1px solid var(--gba-mid); color: var(--gba-bg);
+  font-family: 'Courier New', monospace; font-size: 11px;
+  padding: 2px 6px; cursor: pointer; border-radius: 3px;
+}
+.hud-icon:active { background: var(--gba-mid); }
+#egg-count { margin-left: 2px; font-weight: bold; }
+
+/* ===== 场景切换 Tab ===== */
+.scene-tabs {
+  display: flex; gap: 4px; margin-top: 4px; overflow-x: auto;
+  scrollbar-width: none;
+}
+.scene-tabs::-webkit-scrollbar { display: none; }
+.scene-tab {
+  flex: 1 1 0; min-width: 0; background: #1a1a1a; border: 1px solid var(--gba-mid);
+  color: var(--gba-bg); font-family: 'Courier New', monospace; font-size: 9px;
+  padding: 4px 2px; cursor: pointer; border-radius: 3px;
+  text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.scene-tab.active { background: var(--gba-bg); color: var(--gba-dark); border-color: var(--gba-dark); font-weight: bold; }
+.scene-tab.locked { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== 弹窗通用 ===== */
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center; z-index: 300;
+}
+.modal.hidden { display: none; }
+.modal-panel {
+  position: relative; background: #0f1a0f; border: 2px solid var(--gba-mid);
+  border-radius: 8px; padding: 20px 16px 16px; min-width: 240px; max-width: 90vw;
+  max-height: 80vh; overflow-y: auto;
+}
+.modal-title { color: var(--gba-bg); font-size: 13px; letter-spacing: 2px; text-align: center; margin-bottom: 10px; }
+.modal-hint { color: var(--gba-light); font-size: 11px; text-align: center; margin-top: 10px; }
+.modal-close {
+  position: absolute; top: 6px; right: 8px; background: none; border: none;
+  color: var(--gba-bg); font-size: 14px; cursor: pointer; font-family: inherit;
+}
+
+/* ===== 孵化弹窗 ===== */
+.hatch-egg {
+  font-size: 56px; text-align: center; cursor: pointer; padding: 20px;
+  transition: transform 0.1s;
+}
+.hatch-egg.shaking { animation: egg-shake 0.5s ease-in-out infinite; }
+@keyframes egg-shake {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg) scale(1.05); }
+}
+.hatch-egg.hatched { animation: egg-pop 0.4s ease-out forwards; }
+@keyframes egg-pop {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.hatch-choices { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+.hatch-choices.hidden { display: none; }
+.hatch-card {
+  background: #1a1a1a; border: 2px solid var(--gba-mid); border-radius: 6px;
+  padding: 8px 6px; width: 76px; cursor: pointer; text-align: center;
+  color: var(--gba-bg); font-size: 10px;
+}
+.hatch-card:active { background: var(--gba-mid); }
+.hatch-card .hc-avatar { width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 4px; position: relative; }
+.hatch-card .hc-name { font-size: 11px; font-weight: bold; }
+.hatch-card .hc-pers { font-size: 9px; color: var(--gba-light); margin-top: 2px; }
+
+/* ===== 图鉴 ===== */
+.codex-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; min-width: 240px;
+}
+.codex-cell {
+  background: #1a1a1a; border: 1px solid var(--gba-mid); border-radius: 4px;
+  padding: 6px 4px; text-align: center; color: var(--gba-bg); font-size: 9px;
+}
+.codex-cell.owned { border-color: var(--gba-light); }
+.codex-cell .cc-avatar { width: 24px; height: 24px; margin: 0 auto 4px; border-radius: 3px; }
+.codex-cell.locked .cc-avatar { background: #333 !important; filter: brightness(0.4); }
+.codex-cell .cc-aff { color: var(--gba-light); font-size: 8px; }
