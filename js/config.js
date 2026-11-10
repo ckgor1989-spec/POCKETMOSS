@@ -1,15 +1,24 @@
 // POCKETMOSS — 全局配置（纯数据，零逻辑）
 
-// ===== GBA 色板 =====
+// ===== 明亮像素色板（奶油纸 + 藏青描边 + 高饱和点缀） =====
 export const COLORS = {
-  GBA_DARK:  '#0f380f',
-  GBA_MID:   '#306230',
-  GBA_LIGHT: '#8bac0f',
-  GBA_BG:    '#9bbc0f',
+  GBA_DARK:  '#2f2b4a', // 藏青墨线
+  GBA_MID:   '#c9ab74', // 暖木边框
+  GBA_LIGHT: '#e08a5a', // 珊瑚点缀
+  GBA_BG:    '#2f9e8f', // 薄荷青
+  INK:       '#2f2b4a',
+  PAPER:     '#fff6dc',
+  CREAM:     '#ffe9b8',
+  CORAL:     '#ff8fab',
+  MINT:      '#7ed6a0',
+  SKY:       '#8fd8ff',
   SCENE_GREEN: {
-    skyTop: '#065f46', skyBot: '#022c22',
-    groundTop: '#059669', groundBot: '#047857', groundDark: '#064e3b',
-    accent: '#9bbc0f',
+    skyTop: '#8fdcff', skyMid: '#c4efff', skyBot: '#eefbff',
+    cloud: '#ffffff', cloudShade: '#d8effc', sun: '#ffe066',
+    far: '#a7dcb0', farDark: '#7cc796', mid: '#63bb8b', midDark: '#3f9b6c',
+    groundTop: '#eaf4c4', groundBot: '#cfe6a8', groundLine: '#b5d18c', groundDark: '#9dbb74',
+    accent: '#ff9f68', prop: '#b5794f', propDark: '#7a4a33',
+    leaf: '#7ed6a0', leafDark: '#3f9b6c',
   },
 };
 
@@ -24,10 +33,39 @@ export const ELEMENTS = {
 
 export const SCENES = {
   forest:  { name: 'Whispering Forest', element: 'wood',   colors: COLORS.SCENE_GREEN },
-  volcano: { name: 'Ash Volcano',       element: 'fire',   colors: { skyTop:'#7c3aed', skyBot:'#2e1065', groundTop:'#f97316', groundBot:'#9a3412', groundDark:'#451a03', accent:'#fb923c' } },
-  lake:    { name: 'Crystal Lake',      element: 'water',  colors: { skyTop:'#0369a1', skyBot:'#1e3a8a', groundTop:'#3b82f6', groundBot:'#1d4ed8', groundDark:'#1e3a8a', accent:'#60a5fa' } },
-  peak:    { name: 'Thunder Peak',      element: 'thunder',colors: { skyTop:'#3730a3', skyBot:'#312e81', groundTop:'#a78bfa', groundBot:'#6d28d9', groundDark:'#3b0764', accent:'#c4b5fd' } },
-  cavern:  { name: 'Abyss Cavern',      element: 'shadow', colors: { skyTop:'#3b0764', skyBot:'#0a0a0a', groundTop:'#6b21a8', groundBot:'#3b0764', groundDark:'#0a0a0a', accent:'#a78bfa' } },
+  volcano: { name: 'Ash Volcano',       element: 'fire',   colors: {
+    skyTop:'#ff9a6b', skyMid:'#ffc78f', skyBot:'#ffe7c2',
+    cloud:'#ffe0c4', cloudShade:'#ffc79f', sun:'#fff1a8',
+    far:'#c2664b', farDark:'#9a4632', mid:'#9a4632', midDark:'#6f2f22',
+    groundTop:'#f8dfb2', groundBot:'#e7c186', groundLine:'#cfa163', groundDark:'#b9874c',
+    accent:'#ff6b5b', prop:'#7a4a33', propDark:'#4f2d1f',
+    leaf:'#8fbf6a', leafDark:'#5c8f45', lava:'#ff8a3d', lavaLight:'#ffd166',
+  } },
+  lake:    { name: 'Crystal Lake',      element: 'water',  colors: {
+    skyTop:'#7fd6ff', skyMid:'#b8ecff', skyBot:'#effbff',
+    cloud:'#ffffff', cloudShade:'#dcf3ff', sun:'#ffe066',
+    seaTop:'#63d3ea', seaBot:'#2f9fd0', foam:'#f0fcff',
+    far:'#8fd8c8', farDark:'#5bb8a8', mid:'#5bb8c9', midDark:'#3f95a8',
+    groundTop:'#ffeec0', groundBot:'#f6d995', groundLine:'#e5c184', groundDark:'#d4ac6f',
+    accent:'#ff8fab', prop:'#e46a5a', propDark:'#b3483c',
+    leaf:'#6fd6a8', leafDark:'#35a47c',
+  } },
+  peak:    { name: 'Thunder Peak',      element: 'thunder',colors: {
+    skyTop:'#86cfff', skyMid:'#c2e8ff', skyBot:'#f0fbff',
+    cloud:'#ffffff', cloudShade:'#dbeeff', sun:'#fff4b8',
+    far:'#a8b4ee', farDark:'#8b86df', mid:'#8b86df', midDark:'#665fc4',
+    groundTop:'#dff2cf', groundBot:'#b9e2a6', groundLine:'#94c982', groundDark:'#7cb36c',
+    accent:'#ffd166', prop:'#a9714a', propDark:'#6f4a2e',
+    leaf:'#8fd48a', leafDark:'#5aa86a',
+  } },
+  cavern:  { name: 'Abyss Cavern',      element: 'shadow', colors: {
+    skyTop:'#57479f', skyMid:'#7a67c9', skyBot:'#a794e8',
+    cloud:'#b9a9f5', cloudShade:'#8f7ce8', sun:'#bff8e6',
+    far:'#4a3c8f', farDark:'#3b2f7a', mid:'#6755b8', midDark:'#43357e',
+    groundTop:'#d8cdf8', groundBot:'#bdaef0', groundLine:'#a08ee0', groundDark:'#8776cf',
+    accent:'#7ef9d6', prop:'#4a3f8f', propDark:'#2f2a5e',
+    leaf:'#6fd6c0', leafDark:'#3fa890', crystal:'#7ef9d6',
+  } },
 };
 
 // ===== 全部 15 只精灵（5 元素 × 3） =====

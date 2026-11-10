@@ -104,6 +104,12 @@ function makePainter(g) {
       if (inB(gx, gy)) g[idx(gx, gy)] = 'w';
       if (inB(gx + 1, gy)) g[idx(gx + 1, gy)] = 'w';
     },
+    /** 眼下的 3px 腮红 */
+    blush(x, y) {
+      for (let i = -1; i <= 1; i++) {
+        if (inB(x + i, y)) g[idx(x + i, y)] = 'k';
+      }
+    },
     /** 弧线（w 正数向下微笑，负数向上眯眼） */
     arc(cx, cy, half, depth, ch = 'e') {
       for (let i = -half; i <= half; i++) {
@@ -128,6 +134,8 @@ const SPECIES = {
     p.ellipse(24, 38, 9, 5.5, 'A');
     p.eye(18, 27, 3.2, 3.8);
     p.eye(30, 27, 3.2, 3.8);
+    p.blush(14, 32);
+    p.blush(34, 32);
     p.arc(24, 34, 4, 1.6);
   },
   // 蘑菇灵：宽菌盖白斑 + 圆菌柄
@@ -142,6 +150,8 @@ const SPECIES = {
     p.ellipse(19, 20, 2.4, 1.8, 'w');
     p.eye(20, 32, 3, 3.4);
     p.eye(28, 32, 3, 3.4);
+    p.blush(15, 37);
+    p.blush(33, 37);
     p.arc(24, 38, 3, 1.2);
   },
   // 藤叶精：方身 + 两片斜出的叶子
@@ -154,6 +164,8 @@ const SPECIES = {
     p.rect(23, 14, 2, 5, 'A');
     p.eye(19, 29, 2.8, 3.4);
     p.eye(29, 29, 2.8, 3.4);
+    p.blush(15, 33);
+    p.blush(33, 33);
     p.arc(24, 35, 3, 1.4);
   },
   // 炎狐：尖耳 + 白口鼻 + 蓬松尾巴
@@ -173,6 +185,8 @@ const SPECIES = {
     p.px(24, 23, 'e');
     p.eye(19, 18, 2.6, 3);
     p.eye(29, 18, 2.6, 3);
+    p.blush(14, 22);
+    p.blush(34, 22);
     p.ellipse(24, 36, 6, 4.5, 'A');
   },
   // 熔岩精：大团熔岩 + 发光裂纹
@@ -200,6 +214,8 @@ const SPECIES = {
     p.ellipse(24, 31, 11, 11);
     p.eye(20, 29, 2.6, 3.2);
     p.eye(28, 29, 2.6, 3.2);
+    p.blush(16, 33);
+    p.blush(32, 33);
     p.arc(24, 35, 3, 1.4);
   },
   // 水滴蛙：宽身 + 顶部大眼泡
@@ -212,6 +228,8 @@ const SPECIES = {
     p.ellipse(24, 38, 9, 4.5, 'A');
     p.eye(14, 21, 2.8, 3.2);
     p.eye(34, 21, 2.8, 3.2);
+    p.blush(10, 28);
+    p.blush(38, 28);
     p.arc(24, 32, 8, 2);
   },
   // 水母灵：伞盖 + 四条波浪飘带
@@ -270,6 +288,8 @@ const SPECIES = {
     p.px(24, 25, 'e');
     p.eye(19, 20, 2.6, 3.2);
     p.eye(29, 20, 2.6, 3.2);
+    p.blush(15, 24);
+    p.blush(33, 24);
     p.arc(24, 28, 2, 1);
   },
   // 云朵灵：三团云 + 飘浮
@@ -284,6 +304,8 @@ const SPECIES = {
     p.px(11, 18, 'w');
     p.eye(20, 27, 2.6, 3.2);
     p.eye(28, 27, 2.6, 3.2);
+    p.blush(16, 31);
+    p.blush(32, 31);
     p.arc(24, 32, 3, 1.2);
   },
   // 闪电鸟：双翼 + 尖喙 + 冠羽
@@ -331,6 +353,8 @@ const SPECIES = {
     p.px(11, 17, 'w');
     p.arc(20, 26, 2.5, -1.4);
     p.arc(28, 26, 2.5, -1.4);
+    p.blush(17, 31);
+    p.blush(31, 31);
     p.arc(24, 31, 2, 1);
   },
   // 幽灵种：圆头 + 波浪下摆
@@ -379,7 +403,8 @@ function renderPixelArt(pet) {
   const body = pet.bodyColor;
   const shade = pet.shadowColor;
   const accent = ACCENTS[pet.shape] ?? lighten(body, 0.3);
-  const outline = mix(darken(shade, 0.55), '#101018', 0.3);
+  // 藏青描边：更接近宝可梦卡通的彩色墨线
+  const outline = mix(darken(shade, 0.6), '#2f2b4a', 0.6);
 
   // 包围盒（用于左上来光的方向渐变）
   let minX = G, maxX = 0, minY = G, maxY = 0;
@@ -438,21 +463,28 @@ function renderPixelArt(pet) {
       const u = ((x - minX) / spanX + (y - minY) / spanY) / 2;
       let color;
       if (ch === 'e') {
-        color = '#0b0b12';
+        color = '#171423';
       } else if (ch === 'w') {
-        color = u > 0.82 ? '#e6e2d4' : '#fffdf5';
+        color = u > 0.82 ? '#e9e5d6' : '#fffdf5';
       } else if (ch === 'a') {
         color = accent;
+      } else if (ch === 'k') {
+        color = '#ff9ab2'; // 腮红
       } else {
         const base = ch === 'A' ? accent : body;
         const dark = ch === 'A' ? darken(accent, 0.18) : shade;
-        if (y === topY[x]) color = lighten(base, 0.5);               // 顶部轮廓光
-        else if (u < 0.20) color = lighten(base, 0.30);              // 高光
-        else if (u < 0.60) color = base;                              // 本体
-        else if (u < 0.86) color = dark;                              // 阴影
-        else color = darken(dark, 0.3);                               // 深阴影
+        // 4 阶明暗，交界处用棋盘格抖动，贴近 GBA 像素画
+        const cols = [lighten(base, 0.34), base, dark, darken(dark, 0.32)];
+        const bands = [0.18, 0.56, 0.84];
+        let bi = 0;
+        while (bi < 3 && u >= bands[bi]) bi++;
+        color = cols[bi];
+        const even = ((x + y) & 1) === 0;
+        if (bi < 3 && bands[bi] - u < 0.05 && even) color = cols[bi + 1];
+        if (bi > 0 && u - bands[bi - 1] < 0.05 && !even) color = cols[bi - 1];
+        if (y === topY[x]) color = lighten(base, 0.55);              // 顶部轮廓光
         // 轮廓内缘压暗，强化剪影
-        if (y !== topY[x] && isEdge(x, y)) color = mix(color, outline, 0.45);
+        if (y !== topY[x] && isEdge(x, y)) color = mix(color, outline, 0.5);
       }
 
       ctx.fillStyle = color;
@@ -468,7 +500,7 @@ export function createSpriteEl(pet) {
   root.className = 'sprite-unit';
   root.dataset.petId = pet.id;
   root.style.cssText = `
-    position: absolute; width: 96px; height: 112px;
+    position: absolute; width: 120px; height: 144px;
     transform: translate(-50%, -50%);
     image-rendering: pixelated;
     pointer-events: auto; cursor: pointer;
@@ -478,18 +510,18 @@ export function createSpriteEl(pet) {
 
   // 地板投影
   const shadow = document.createElement('div');
-  shadow.style.cssText = `position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
-    width:56px;height:9px;background:#000;border-radius:50%;opacity:0.3;`;
+  shadow.style.cssText = `position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+    width:72px;height:12px;background:#2f2b4a;border-radius:50%;opacity:0.2;`;
   root.appendChild(shadow);
 
   // 待机浮动
   const bob = document.createElement('div');
   bob.className = 'sprite-bob';
-  bob.style.cssText = 'position:absolute;bottom:12px;left:50%;transform:translateX(-50%);';
+  bob.style.cssText = 'position:absolute;bottom:16px;left:50%;transform:translateX(-50%);';
   bob.style.animationDelay = -(Math.random() * 2.6).toFixed(2) + 's';
   const cv = renderPixelArt(pet);
-  cv.style.cssText = `display:block;height:96px;width:auto;image-rendering:pixelated;
-    filter:drop-shadow(0 3px 0 rgba(0,0,0,0.35));`;
+  cv.style.cssText = `display:block;height:120px;width:auto;image-rendering:pixelated;
+    filter:drop-shadow(0 3px 0 rgba(47,43,74,0.28));`;
   bob.appendChild(cv);
   root.appendChild(bob);
 
