@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POCKETMOSS — 游戏内 UI 布局方案</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Courier New', monospace;
+    background: #0f0f1a;
+    min-height: 100vh;
+    color: #c8c8d0;
+    padding: 30px 20px;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  h1 { font-size: 1.8em; text-align: center; margin-bottom: 6px;
+    color: #9bbc0f; letter-spacing: 3px; text-shadow: 2px 2px 0 #306230; }
+  .subtitle { text-align:center; color:#6b6b7b; margin-bottom: 32px; font-size: 0.95em; }
+  h2 { font-size: 1.2em; margin-bottom: 16px; color: #9bbc0f;
+    border-left: 4px solid #9bbc0f; padding-left: 10px; }
+  h3 { font-size: 1em; margin: 12px 0 6px; color: #a9ff6a; }
+  .section { margin-bottom: 48px; }
+  .layout-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+  .layout-card {
+    background: #1a1a2e;
+    border: 2px solid #2a2a3e;
+    border-radius: 0;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .layout-card:hover { border-color: #9bbc0f; background: #1e2436; }
+  .layout-card.selected { border-color: #a9ff6a; box-shadow: inset 0 0 0 2px #a9ff6a; }
+  .layout-body { margin-top: 14px; text-align: left; }
+  .layout-body p { color: #9a9aa8; font-size: 0.82em; line-height: 1.6; }
+  .pro-con { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .pro { background:#1a2a1a;color:#8bc66a;padding:6px 8px;font-size:0.78em;border-left:3px solid #4a7a2a;}
+  .con { background:#2a1a1a;color:#c66a6a;padding:6px 8px;font-size:0.78em;border-left:3px solid #7a2a2a;}
+  .hint { text-align: center; margin-top: 28px; color: #555; font-size: 0.85em; }
+
+  /* ===== GBA 色板变量 ===== */
+  /* GBA sp 默认: 深绿背景 #9bbc0f / 浅绿 #8bac0f / 中绿 #306230 / 深绿 #0f380f */
+
+  /* ===== 手机框架统一 ===== */
+  .phone-frame {
+    width: 260px; height: 520px;
+    margin: 0 auto;
+    background: #0a0a0a;
+    border-radius: 28px;
+    padding: 8px;
+    border: 2px solid #222;
+    position: relative;
+    box-shadow: 0 0 0 4px #151515, 0 20px 40px rgba(0,0,0,0.6);
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    image-rendering: pixelated;
+  }
+  /* GBA 像素 font 模拟 */
+  .gba-font { font-family: 'Courier New', monospace; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>POCKETMOSS · UI 布局方案对比</h1>
+  <p class="subtitle">像素美学 × 手机全屏 · 场景制群像</p>
+
+  <div class="section">
+    <h2>三种信息密度 & 交互分层方案</h2>
+    <div class="layout-options">
+
+      <!-- ======= LAYOUT A: Minimal Bottom Bar ======= -->
+      <div class="layout-card" onclick="selectLayout(this,'A')">
+        <!-- Phone Mockup -->
+        <div class="phone-frame">
+          <div class="phone-screen" style="background:linear-gradient(180deg,#065f46 0%,#022c22 50%,#010808 100%);">
+            <!-- Status bar top -->
+            <div style="position:absolute;top:0;left:0;right:0;background:#000000cc;padding:6px 10px;display:flex;justify-content:space-between;font-family:monospace;font-size:9px;color:#9bbc0f;">
+              <span>❂ FOREST</span>
+              <span>14:23</span>
+              <span>BATT●●●</span>
+            </div>
+            <!-- Scene area (full bleed minus bottom) -->
+            <div style="position:absolute;top:32px;bottom:72px;left:0;right:0;overflow:hidden;">
+              <!-- sky decoration -->
+              <div style="position:absolute;top:6px;left:8px;width:26px;height:14px;background:#0d4d3b;border-radius:14px;opacity:0.6;"></div>
+              <div style="position:absolute;top:14px;right:16px;width:34px;height:16px;background:#0d4d3b;border-radius:16px;opacity:0.5;"></div>
+              <!-- ground 2.5D -->
+              <div style="position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(180deg,#059669 0%,#047857 30%,#064e3b 100%);clip-path:polygon(0 25%,100% 25%,92% 100%,8% 100%);"></div>
+              <!-- horizon line -->
+              <div style="position:absolute;bottom:60%;left:0;right:0;height:2px;background:#0a3a2a;"></div>
+              <!-- Group of pets -->
+              <div style="position:absolute;bottom:28%;left:25%;">
+                <div style="width:34px;height:38px;background:#10b981;border-radius:4px 4px 6px 6px;box-shadow:inset -3px 0 0 #059669,0 2px 0 #010808;position:relative;">
+                  <div style="position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:11px solid #34d399;"></div>
+                  <div style="position:absolute;bottom:10px;left:5px;width:3px;height:4px;background:#0a0a0a;border-radius:50%;"></div>
+                  <div style="position:absolute;bottom:10px;right:5px;width:3px;height:4px;background:#0a0a0a;border-radius:50%;"></div>
+                </div>
+                <div style="width:30px;height:4px;background:#000;border-radius:50%;opacity:0.25;margin:2px auto 0;"></div>
+              </div>
+              <div style="position:absolute;bottom:22%;left:55%;">
+                <div style="width:26px;height:30px;background:#34d399;border-radius:50%;box-shadow:0 2px 0 #010808;position:relative;">
+                  <div style="position:absolute;top:8px;left:5px;width:3px;height:3px;background:#0a0a0a;"></div>
+                  <div style="position:absolute;top:8px;right:5px;width:3px;height:3px;background:#0a0a0a;"></div>
+                </div>
+                <div style="width:24px;height:3px;background:#000;border-radius:50%;opacity:0.2;margin:2px auto 0;"></div>
+              </div>
+              <div style="position:absolute;bottom:32%;right:15%;">
+                <div style="width:22px;height:26px;background:#86efac;border-radius:50% 50% 40% 40%;box-shadow:0 2px 0 #010808;position:relative;">
+                  <div style="position:absolute;top:6px;left:4px;width:2px;height:2px;background:#0a0a0a;"></div>
+                  <div style="position:absolute;top:6px;right:4px;width:2px;height:2px;background:#0a0a0a;"></div>
+                </div>
+                <div style="width:20px;height:3px;background:#000;border-radius:50%;opacity:0.2;margin:2px auto 0;"></div>
+              </div>
+              <!-- Chat bubble from selected pet -->
+              <div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);background:#9bbc0f;color:#0f380f;padding:4px 10px;font-family:monospace;font-size:9px;border-radius:8px;border:2px solid #0f380f;max-width:120px;text-align:center;">zzz... 好累哦</div>
+            </div>
+            <!-- Bottom bar: 3 tabs -->
+            <div style="position:absolute;bottom:0;left:0;right:0;height:72px;background:#000;border-top:2px solid #306230;display:flex;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9bbc0f;font-family:monospace;font-size:9px;gap:4px;border-right:1px solid #306230;background:#0f380f;">
+                <div style="width:16px;height:16px;background:#9bbc0f;border-radius:2px;position:relative;">
+                  <div style="position:absolute;top:3px;left:3px;width:3px;height:3px;background:#0f380f;"></div>
+                  <div style="position:absolute;top:3px;right:3px;width:3px;height:3px;background:#0f380f;"></div>
+                  <div style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:6px;height:2px;background:#0f380f;"></div>
+                </div>
+                <span>互动</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#306230;font-family:monospace;font-size:9px;gap:4px;border-right:1px solid #306230;">
+                <div style="width:16px;height:16px;border:2px solid #306230;border-radius:50%;"></div>
+                <span>散步</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#306230;font-family:monospace;font-size:9px;gap:4px;">
+                <div style="width:16px;height:16px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;">
+                  <div style="background:#306230;"></div>
+                  <div style="background:#306230;"></div>
+                  <div style="background:#306230;"></div>
+                  <div style="background:#306230;"></div>
+                </div>
+                <span>图鉴</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layout-body">
+          <h3>A · 极简沉浸底栏</h3>
+          <p>场景画面全屏，底部只有 3 个标签切换（互动/散步/图鉴）。HUD 极简，只保留场景名、时间、电量。点击宠物弹出浮动菜单。</p>
+          <div class="pro-con">
+            <div class="pro">✓ 画面沉浸，群像最清晰</div>
+            <div class="con">✗ 深层操作多一次点击</div>
+            <div class="pro">✓ 触摸区域最大化</div>
+            <div class="con">✗ 状态数值需要下拉才能看</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= LAYOUT B: Side HUD Column ======= -->
+      <div class="layout-card" onclick="selectLayout(this,'B')">
+        <div class="phone-frame">
+          <div class="phone-screen" style="background:linear-gradient(180deg,#1e1b4b,#0f172a);">
+            <!-- Scene area -->
+            <div style="position:absolute;top:0;bottom:0;left:56px;right:0;overflow:hidden;">
+              <div style="position:absolute;top:20px;right:14px;width:18px;height:18px;background:#fbbf24;border-radius:50%;box-shadow:0 0 16px #fbbf24;"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:55%;background:linear-gradient(180deg,#7c3aed,#4c1d95,#2e1065);clip-path:polygon(0 25%,100% 25%,92% 100%,8% 100%);"></div>
+              <div style="position:absolute;bottom:55%;left:0;right:0;height:2px;background:#1e1b4b;"></div>
+              <!-- 2 pets -->
+              <div style="position:absolute;bottom:30%;left:30%;">
+                <div style="width:32px;height:34px;background:#a78bfa;border-radius:50% 50% 40% 40%;box-shadow:0 2px 0 #1e1b4b;position:relative;">
+                  <div style="position:absolute;top:8px;left:6px;width:3px;height:4px;background:#1e1b4b;"></div>
+                  <div style="position:absolute;top:8px;right:6px;width:3px;height:4px;background:#1e1b4b;"></div>
+                </div>
+                <div style="width:28px;height:3px;background:#000;border-radius:50%;opacity:0.2;margin:2px auto 0;"></div>
+              </div>
+              <div style="position:absolute;bottom:25%;right:20%;">
+                <div style="width:24px;height:30px;background:#c4b5fd;border-radius:50%;box-shadow:0 2px 0 #1e1b4b;"></div>
+                <div style="width:22px;height:3px;background:#000;border-radius:50%;opacity:0.2;margin:2px auto 0;"></div>
+              </div>
+              <!-- Chat bubble -->
+              <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#a78bfa;color:#1e1b4b;padding:3px 8px;font-family:monospace;font-size:8px;border-radius:6px;border:1px solid #1e1b4b;">你来了~ 想散步吗？</div>
+            </div>
+            <!-- Left HUD column -->
+            <div style="position:absolute;top:0;bottom:0;left:0;width:56px;background:#0a0a0aee;border-right:2px solid #6d28d9;padding:6px 4px;display:flex;flex-direction:column;gap:6px;">
+              <!-- Scene name -->
+              <div style="font-family:monospace;font-size:7px;color:#a78bfa;text-align:center;padding-bottom:4px;border-bottom:1px solid #3b0764;">SHADOW<br>CAVE</div>
+              <!-- Pet 1 stats -->
+              <div style="background:#1a1a2e;padding:4px;border:1px solid #3b0764;">
+                <div style="width:20px;height:20px;background:#a78bfa;border-radius:50%;margin:0 auto 2px;position:relative;">
+                  <div style="position:absolute;top:5px;left:3px;width:2px;height:2px;background:#000;"></div>
+                  <div style="position:absolute;top:5px;right:3px;width:2px;height:2px;background:#000;"></div>
+                </div>
+                <div style="font-family:monospace;font-size:5px;color:#c4b5fd;text-align:center;margin-bottom:2px;">影蝠</div>
+                <div style="background:#000;height:3px;margin-bottom:1px;"><div style="background:#ef4444;height:100%;width:75%;"></div></div>
+                <div style="background:#000;height:3px;margin-bottom:1px;"><div style="background:#fbbf24;height:100%;width:60%;"></div></div>
+                <div style="background:#000;height:3px;"><div style="background:#3b82f6;height:100%;width:40%;"></div></div>
+              </div>
+              <!-- Pet 2 stats -->
+              <div style="background:#1a1a2e;padding:4px;border:1px solid #3b0764;">
+                <div style="width:20px;height:20px;background:#c4b5fd;border-radius:50%;margin:0 auto 2px;"></div>
+                <div style="font-family:monospace;font-size:5px;color:#c4b5fd;text-align:center;margin-bottom:2px;">梦灵</div>
+                <div style="background:#000;height:3px;margin-bottom:1px;"><div style="background:#ef4444;height:100%;width:50%;"></div></div>
+                <div style="background:#000;height:3px;margin-bottom:1px;"><div style="background:#fbbf24;height:100%;width:80%;"></div></div>
+                <div style="background:#000;height:3px;"><div style="background:#3b82f6;height:100%;width:65%;"></div></div>
+              </div>
+              <!-- Spacer -->
+              <div style="flex:1;"></div>
+              <!-- Time -->
+              <div style="font-family:monospace;font-size:6px;color:#6b7280;text-align:center;">23:47</div>
+              <div style="width:100%;height:2px;background:#1f2937;border-radius:1px;"><div style="width:80%;height:100%;background:#10b981;border-radius:1px;"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="layout-body">
+          <h3>B · 侧边 HUD 栏</h3>
+          <p>左侧 56px 窄栏常驻显示所有在场宠物的头像 + 三条状态条（❤⚡💧），右侧是全屏场景。信息随时可见，不遮挡主要画面。</p>
+          <div class="pro-con">
+            <div class="pro">✓ 状态数值永远可见</div>
+            <div class="con">✗ 画面被占 20% 宽度</div>
+            <div class="pro">✓ 多宠一目了然</div>
+            <div class="con">✗ HUD 窄栏需要精细排版</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= LAYOUT C: Grid Overlay ======= -->
+      <div class="layout-card" onclick="selectLayout(this,'C')">
+        <div class="phone-frame">
+          <div class="phone-screen" style="background:linear-gradient(180deg,#78350f,#451a03);">
+            <!-- Scene -->
+            <div style="position:absolute;top:0;bottom:0;left:0;right:0;overflow:hidden;">
+              <div style="position:absolute;top:14px;right:12px;width:22px;height:22px;background:#f97316;border-radius:50%;box-shadow:0 0 20px #f97316;"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(180deg,#ea580c,#9a3412,#451a03);clip-path:polygon(0 30%,100% 30%,94% 100%,6% 100%);"></div>
+              <!-- 3 pets -->
+              <div style="position:absolute;bottom:22%;left:20%;">
+                <div style="width:28px;height:32px;background:#f97316;border-radius:4px 4px 14px 14px;box-shadow:0 2px 0 #451a03;position:relative;">
+                  <div style="position:absolute;top:-5px;left:2px;width:0;height:0;border-left:6px solid transparent;border-right:4px solid transparent;border-bottom:9px solid #f97316;"></div>
+                  <div style="position:absolute;top:-5px;right:2px;width:0;height:0;border-left:4px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #f97316;"></div>
+                  <div style="position:absolute;top:8px;left:5px;width:3px;height:3px;background:#0a0a0a;"></div>
+                  <div style="position:absolute;top:8px;right:5px;width:3px;height:3px;background:#0a0a0a;"></div>
+                  <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:4px;height:2px;background:#0a0a0a;border-radius:0 0 3px 3px;"></div>
+                </div>
+                <div style="width:24px;height:3px;background:#000;border-radius:50%;opacity:0.25;margin:2px auto 0;"></div>
+              </div>
+              <div style="position:absolute;bottom:18%;left:48%;">
+                <div style="width:22px;height:24px;background:#fb923c;border-radius:50%;box-shadow:0 2px 0 #451a03;"></div>
+                <div style="width:20px;height:3px;background:#000;border-radius:50%;opacity:0.2;margin:2px auto 0;"></div>
+              </div>
+              <div style="position:absolute;bottom:28%;right:18%;">
+                <div style="width:20px;height:22px;background:#fdba74;border-radius:6px;box-shadow:0 2px 0 #451a03;"></div>
+                <div style="width:18px;height:2px;background:#000;border-radius:50%;opacity:0.2;margin:2px auto 0;"></div>
+              </div>
+            </div>
+            <!-- Top overlay HUD grid -->
+            <div style="position:absolute;top:0;left:0;right:0;background:#000000d0;padding:6px 8px;font-family:monospace;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#f97316;margin-bottom:4px;">
+                <span>▲ VOLCANO CRATER</span>
+                <span>●●●○○</span>
+                <span>17:52</span>
+              </div>
+              <!-- Status bars for all 3 pets in one row -->
+              <div style="display:flex;gap:6px;">
+                <div style="flex:1;display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;align-items:center;gap:3px;font-size:7px;color:#fdba74;">
+                    <div style="width:8px;height:8px;background:#f97316;border-radius:2px;"></div>
+                    <span>炎狐</span>
+                  </div>
+                  <div style="background:#1a1a1a;height:4px;"><div style="background:#ef4444;height:100%;width:80%;"></div></div>
+                  <div style="background:#1a1a1a;height:4px;"><div style="background:#fbbf24;height:100%;width:65%;"></div></div>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;align-items:center;gap:3px;font-size:7px;color:#fdba74;">
+                    <div style="width:8px;height:8px;background:#fb923c;border-radius:50%;"></div>
+                    <span>熔岩精</span>
+                  </div>
+                  <div style="background:#1a1a1a;height:4px;"><div style="background:#ef4444;height:100%;width:45%;"></div></div>
+                  <div style="background:#1a1a1a;height:4px;"><div style="background:#fbbf24;height:100%;width:90%;"></div></div>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;align-items:center;gap:3px;font-size:7px;color:#fdba74;">
+                    <div style="width:8px;height:8px;background:#fdba74;border-radius:2px;"></div>
+                    <span>火星种</span>
+                  </div>
+                  <div style="background:#1a1a1a;height:4px;"><div style="background:#ef4444;height:100%;width:60%;"></div></div>
+                  <div style="background:#1a1a1a;height:4px;"><div style="background:#fbbf24;height:100%;width:30%;"></div></div>
+                </div>
+              </div>
+            </div>
+            <!-- Bottom quick action bar -->
+            <div style="position:absolute;bottom:0;left:0;right:0;background:#000000d0;border-top:2px solid #ea580c;padding:6px;display:flex;justify-content:space-around;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:monospace;font-size:7px;color:#fdba74;">
+                <div style="width:22px;height:22px;border:2px solid #fdba74;border-radius:4px;position:relative;">
+                  <div style="position:absolute;top:3px;left:50%;transform:translateX(-50%);width:12px;height:8px;background:#fb923c;border-radius:2px 2px 6px 6px;"></div>
+                </div>
+                <span>喂食</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:monospace;font-size:7px;color:#fdba74;">
+                <div style="width:22px;height:22px;border:2px solid #fdba74;border-radius:50%;position:relative;">
+                  <div style="position:absolute;top:3px;left:3px;width:4px;height:4px;background:#fb923c;border-radius:50%;"></div>
+                  <div style="position:absolute;top:3px;right:3px;width:4px;height:4px;background:#fb923c;border-radius:50%;"></div>
+                </div>
+                <span>玩耍</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:monospace;font-size:7px;color:#fdba74;">
+                <div style="width:22px;height:22px;border:2px solid #fdba74;border-radius:4px;position:relative;">
+                  <div style="position:absolute;top:3px;left:3px;width:4px;height:4px;background:#60a5fa;"></div>
+                  <div style="position:absolute;bottom:3px;right:3px;width:4px;height:4px;background:#60a5fa;"></div>
+                </div>
+                <span>清洁</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:monospace;font-size:7px;color:#fdba74;background:#ea580c;padding:2px 6px;border-radius:4px;">
+                <div style="width:22px;height:22px;border:2px solid #000;border-radius:4px;position:relative;background:#fbbf24;">
+                  <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);font-size:10px;color:#000;">AI</div>
+                </div>
+                <span>对话</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:monospace;font-size:7px;color:#fdba74;">
+                <div style="width:22px;height:22px;border:2px solid #fdba74;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;">▶</div>
+                <span>散步</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layout-body">
+          <h3>C · 全屏双叠 Grid</h3>
+          <p>顶部叠加 HUD（场景名 + 所有宠物的状态条），底部叠加快捷动作栏（5 个按钮，含 AI 对话入口）。画面最丰富，但部分场景会被遮挡。</p>
+          <div class="pro-con">
+            <div class="pro">✓ 信息密度最高</div>
+            <div class="con">✗ 画面被叠层遮挡</div>
+            <div class="pro">✓ 所有操作一触可达</div>
+            <div class="con">✗ 群像场景的视觉呼吸感弱</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <p class="hint">↑ 点击选择你喜欢的布局，或告诉我想混搭（例如 A 的场景 + B 的 HUD）</p>
+  </div>
+
+  <script>
+    function selectLayout(el, id) {
+      document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      console.log('Selected layout:', id);
+    }
+  </script>
+</div>
+</body>
+</html>
