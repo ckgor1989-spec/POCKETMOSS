@@ -1,0 +1,171 @@
+<h2>POCKETMOSS — GBAsp 风格外观概念</h2>
+<p class="subtitle">模拟 Game Boy Advance SP 外壳 + 2.5D 像素宠物屏幕</p>
+
+<div class="section">
+  <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;">
+
+    <!-- GBAsp Unit A: Classic Clamshell -->
+    <div class="card" data-choice="classic" onclick="toggleSelect(this)" style="width:280px;">
+      <div class="card-image" style="padding:20px;background:#1a1a2e;border-radius:12px;">
+        <div style="background:#2a2a3a;border:3px solid #444;border-radius:16px;padding:12px;box-shadow:inset 0 -4px 0 #111;">
+          <!-- Top screen half -->
+          <div style="background:#8b7355;border-radius:8px;padding:8px;box-shadow:inset 0 2px 0 #6b5344;">
+            <div style="background:#9bbc0f;border:2px solid #0f380f;border-radius:4px;height:140px;display:flex;align-items:center;justify-content:center;position:relative;">
+              <!-- Pixel pet: a little moss creature -->
+              <div style="image-rendering:pixelated;width:80px;height:80px;background:
+                linear-gradient(#00000000,#00000000),
+                repeating-linear-gradient(0deg,#306230 0 6px,#8bac0f 6px 12px);
+                border-radius:50% 50% 40% 40%;position:relative;
+                box-shadow: 0 4px 0 #0f380f, inset 0 -8px 0 #306230;">
+                <!-- eyes -->
+                <div style="position:absolute;top:22px;left:18px;width:10px;height:10px;background:#0f380f;border-radius:50%;"></div>
+                <div style="position:absolute;top:22px;right:18px;width:10px;height:10px;background:#0f380f;border-radius:50%;"></div>
+                <!-- mouth -->
+                <div style="position:absolute;top:48px;left:50%;transform:translateX(-50%);width:16px;height:6px;background:#0f380f;border-radius:0 0 8px 8px;"></div>
+              </div>
+              <!-- ground line -->
+              <div style="position:absolute;bottom:10px;left:10px;right:10px;height:4px;background:#306230;"></div>
+            </div>
+          </div>
+          <!-- Button area -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:4px 8px;">
+            <!-- D-pad -->
+            <div style="width:60px;height:60px;position:relative;">
+              <div style="position:absolute;top:18px;left:0;width:24px;height:24px;background:#555;border-radius:4px;"></div>
+              <div style="position:absolute;top:18px;right:0;width:24px;height:24px;background:#555;border-radius:4px;"></div>
+              <div style="position:absolute;top:0;left:18px;width:24px;height:24px;background:#555;border-radius:4px;"></div>
+              <div style="position:absolute;bottom:0;left:18px;width:24px;height:24px;background:#555;border-radius:4px;"></div>
+            </div>
+            <!-- A/B buttons -->
+            <div style="display:flex;gap:8px;transform:rotate(-25deg);">
+              <div style="width:28px;height:28px;background:#8b0000;border-radius:50%;box-shadow:0 3px 0 #5a0000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:bold;">B</div>
+              <div style="width:28px;height:28px;background:#00008b;border-radius:50%;box-shadow:0 3px 0 #000055;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:bold;">A</div>
+            </div>
+          </div>
+          <!-- Start/Select -->
+          <div style="display:flex;justify-content:center;gap:16px;margin-top:4px;">
+            <div style="width:28px;height:8px;background:#444;border-radius:4px;"></div>
+            <div style="width:28px;height:8px;background:#444;border-radius:4px;"></div>
+          </div>
+          <!-- Speakers -->
+          <div style="display:flex;justify-content:flex-end;gap:2px;margin-top:8px;">
+            <div style="width:2px;height:10px;background:#666;transform:rotate(-30deg);"></div>
+            <div style="width:2px;height:10px;background:#666;transform:rotate(-30deg);"></div>
+            <div style="width:2px;height:10px;background:#666;transform:rotate(-30deg);"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>A · 经典折叠式</h3>
+        <p>还原 GBAsp 开合造型，上下双屏感，像素宠物在下屏活动区</p>
+      </div>
+    </div>
+
+    <!-- GBAsp Unit B: Flat Bar -->
+    <div class="card" data-choice="flat" onclick="toggleSelect(this)" style="width:280px;">
+      <div class="card-image" style="padding:20px;background:#16213e;border-radius:12px;">
+        <div style="background:#1f4068;border:3px solid #0f3460;border-radius:20px;padding:10px;box-shadow:0 6px 0 #0f3460;">
+          <!-- Screen -->
+          <div style="background:#1a1a2e;border:3px solid #2a2a3a;border-radius:6px;padding:6px;">
+            <div style="background:#0d1b2a;border-radius:2px;height:140px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+              <!-- 2.5D scene: floor perspective -->
+              <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,#1b263b 40%);"></div>
+              <div style="position:absolute;bottom:10px;left:20%;right:20%;height:2px;background:#e0e1dd;"></div>
+              <!-- Pixel pet robot-cat -->
+              <div style="width:70px;height:70px;position:relative;">
+                <!-- body -->
+                <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:50px;height:44px;background:#e09f3e;border-radius:8px 8px 4px 4px;"></div>
+                <!-- head -->
+                <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:44px;height:36px;background:#e09f3e;border-radius:50% 50% 40% 40%;">
+                  <div style="position:absolute;top:14px;left:8px;width:6px;height:8px;background:#1b263b;border-radius:2px;"></div>
+                  <div style="position:absolute;top:14px;right:8px;width:6px;height:8px;background:#1b263b;border-radius:2px;"></div>
+                  <div style="position:absolute;top:26px;left:50%;transform:translateX(-50%);width:8px;height:3px;background:#1b263b;border-radius:2px;"></div>
+                </div>
+                <!-- ears -->
+                <div style="position:absolute;top:-6px;left:30%;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:12px solid #e09f3e;"></div>
+                <div style="position:absolute;top:-6px;right:30%;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:12px solid #e09f3e;"></div>
+              </div>
+              <!-- chat bubble -->
+              <div style="position:absolute;top:8px;right:8px;background:#fff;border-radius:10px;padding:4px 8px;font-size:9px;color:#333;max-width:90px;line-height:1.3;">mrrp?</div>
+            </div>
+          </div>
+          <!-- Controls -->
+          <div style="display:flex;justify-content:space-between;margin-top:10px;">
+            <div style="display:grid;grid-template-columns:repeat(3,12px);grid-template-rows:repeat(3,12px);gap:3px;">
+              <div></div>
+              <div style="background:#533483;border-radius:2px;"></div>
+              <div></div>
+              <div style="background:#533483;border-radius:2px;"></div>
+              <div></div>
+              <div style="background:#533483;border-radius:2px;"></div>
+              <div></div>
+              <div style="background:#533483;border-radius:2px;"></div>
+              <div></div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <div style="width:22px;height:22px;background:#e94560;border-radius:50%;"></div>
+              <div style="width:22px;height:22px;background:#e94560;border-radius:50%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>B · 横向直板</h3>
+        <p>横版长条机身，更贴近手机握持感，宠物有 AI 对话气泡</p>
+      </div>
+    </div>
+
+    <!-- GBAsp Unit C: Phone-Form Shell -->
+    <div class="card" data-choice="phone" onclick="toggleSelect(this)" style="width:280px;">
+      <div class="card-image" style="padding:20px;background:#2d1b3d;border-radius:12px;">
+        <div style="background:#4a1942;border:3px solid #3d1435;border-radius:28px;padding:8px;box-shadow:0 8px 0 #3d1435;">
+          <!-- Full screen phone look -->
+          <div style="background:#0a0a0a;border-radius:20px;padding:4px;border:2px solid #111;">
+            <!-- Status bar -->
+            <div style="background:#1a0a1a;border-radius:14px 14px 2px 2px;padding:4px 10px;display:flex;justify-content:space-between;font-size:8px;color:#a78bfa;margin-bottom:2px;">
+              <span>POCKETMOSS v1.0</span><span>●●●●</span>
+            </div>
+            <!-- Game area -->
+            <div style="background:linear-gradient(#1e1b4b 0%,#312e81 100%);border-radius:2px;height:160px;position:relative;overflow:hidden;">
+              <!-- Sun -->
+              <div style="position:absolute;top:10px;right:12px;width:20px;height:20px;background:#fbbf24;border-radius:50%;box-shadow:0 0 20px #fbbf24;"></div>
+              <!-- Clouds -->
+              <div style="position:absolute;top:20px;left:16px;width:40px;height:12px;background:#fff;border-radius:20px;opacity:0.7;"></div>
+              <!-- Ground (2.5D floor) -->
+              <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(180deg,#065f46,#022c22);clip-path:polygon(0 30%,100% 30%,95% 100%,5% 100%);"></div>
+              <!-- Pixel hero: standing on floor -->
+              <div style="position:absolute;bottom:30%;left:50%;transform:translateX(-50%);">
+                <!-- body/leaf creature -->
+                <div style="width:40px;height:50px;position:relative;">
+                  <div style="position:absolute;bottom:0;width:40px;height:38px;background:#10b981;border-radius:6px 6px 8px 8px;box-shadow:inset -4px 0 0 #059669;"></div>
+                  <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:16px solid #34d399;"></div>
+                  <div style="position:absolute;bottom:14px;left:8px;width:5px;height:7px;background:#fff;border-radius:50%;"><div style="width:3px;height:4px;background:#000;margin-left:1px;margin-top:2px;border-radius:50%;"></div></div>
+                  <div style="position:absolute;bottom:14px;right:8px;width:5px;height:7px;background:#fff;border-radius:50%;"><div style="width:3px;height:4px;background:#000;margin-left:1px;margin-top:2px;border-radius:50%;"></div></div>
+                </div>
+                <!-- shadow -->
+                <div style="width:36px;height:6px;background:#000;border-radius:50%;opacity:0.3;margin:0 auto;"></div>
+              </div>
+              <!-- Status HUD -->
+              <div style="position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:3px;">
+                <div style="background:#000000aa;padding:2px 6px;border-radius:4px;font-size:7px;color:#f87171;">❤ ●●●○○</div>
+                <div style="background:#000000aa;padding:2px 6px;border-radius:4px;font-size:7px;color:#fbbf24;">⚡ ●●●●○</div>
+                <div style="background:#000000aa;padding:2px 6px;border-radius:4px;font-size:7px;color:#60a5fa;">💧 ●●○○○</div>
+              </div>
+            </div>
+          </div>
+          <!-- Touch hint -->
+          <div style="text-align:center;font-size:8px;color:#a78bfa;margin-top:6px;padding:4px 0;">TAP · SWIPE · HOLD</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>C · 手机原生壳</h3>
+        <p>最贴近手机形态，完整全屏游戏画面 + HUD，触摸友好</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <p class="subtitle" style="text-align:center;">点击选择你倾向的外观方向，或告诉我你想混合哪些元素</p>
+</div>
