@@ -149,7 +149,8 @@ class PocketMossGame {
     document.getElementById('chat-close').addEventListener('click', () => this.closeChat());
     document.getElementById('chat-send').addEventListener('click', () => this.sendChat());
     document.getElementById('chat-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') this.sendChat();
+      // 中文输入法合成中（选词/确认拼音）不触发发送
+      if (e.key === 'Enter' && !e.isComposing) this.sendChat();
     });
   }
 
