@@ -35,7 +35,7 @@ function mixHex(a, b, t) {
   return `#${f(r1 + (r2 - r1) * t)}${f(g1 + (g2 - g1) * t)}${f(b1 + (b2 - b1) * t)}`;
 }
 
-const INK = '#2f2b4a';
+const INK = '#3a2a1e';
 
 // ===== 像素绘制基元 =====
 function R(c, x, y, w, h, col) {
@@ -282,7 +282,6 @@ export class SceneRenderer {
     const ctx = this.lctx;
     ctx.clearRect(0, 0, this.LW, this.LH);
     this.drawSky(c, scene.key);
-    if (scene.key !== 'cavern') this.drawBanner(c, scene.key);
     this.drawBackdrop(c, scene.key);
     this.drawGround(c, scene.key);
     this.drawProps(c, scene.key);
@@ -350,31 +349,6 @@ export class SceneRenderer {
     disc(ctx, x + k * 1.2, y - k * 0.5, k * 0.9, c.cloud);
     disc(ctx, x - k * 1.1, y + 1, k * 0.7, c.cloud);
     R(ctx, x - k * 1.4, y + k * 0.55, k * 3.2, Math.max(2, k * 0.35), c.cloudShade);
-  }
-
-  // ================= 三角彩旗 =================
-  drawBanner(c, key) {
-    const { LW, LH } = this;
-    const ctx = this.lctx;
-    const y0 = Math.round(LH * 0.055);
-    const sag = Math.round(LH * 0.02);
-    const cols = ['#ff8fab', '#ffd166', '#7ed6a0', '#8fd8ff'];
-    for (let x = 0; x < LW; x++) {
-      const p = x / LW;
-      const y = y0 + Math.round(Math.sin(Math.PI * p) * sag);
-      R(ctx, x, y, 1, 1, INK);
-    }
-    let idx = 0;
-    for (let x = 10; x < LW - 6; x += 18) {
-      const p = x / LW;
-      const y = y0 + Math.round(Math.sin(Math.PI * p) * sag) + 1;
-      const col = cols[idx++ % cols.length];
-      for (let r = 0; r < 7; r++) {
-        const w = Math.max(1, Math.round(7 - r));
-        R(ctx, x - w / 2, y + r, w, 1, col);
-      }
-      R(ctx, x - 3, y, 7, 1, shade(col, 0.9));
-    }
   }
 
   // ================= 远景 / 中景 =================

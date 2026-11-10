@@ -1,70 +1,70 @@
 // POCKETMOSS — 全局配置（纯数据，零逻辑）
 
-// ===== 明亮像素色板（奶油纸 + 藏青描边 + 高饱和点缀） =====
+// ===== 星露谷式暖色像素色板：木框 + 羊皮纸 + 深棕墨线 + 自然草木色 =====
 export const COLORS = {
-  GBA_DARK:  '#2f2b4a', // 藏青墨线
-  GBA_MID:   '#c9ab74', // 暖木边框
-  GBA_LIGHT: '#e08a5a', // 珊瑚点缀
-  GBA_BG:    '#2f9e8f', // 薄荷青
-  INK:       '#2f2b4a',
-  PAPER:     '#fff6dc',
-  CREAM:     '#ffe9b8',
-  CORAL:     '#ff8fab',
-  MINT:      '#7ed6a0',
-  SKY:       '#8fd8ff',
+  GBA_DARK:  '#3a2a1e', // 深棕墨线
+  GBA_MID:   '#8a5a3b', // 木框
+  GBA_LIGHT: '#c96a4a', // 陶土橘
+  GBA_BG:    '#3f7d54', // 深叶绿
+  INK:       '#3a2a1e',
+  PAPER:     '#f6e6c4',
+  CREAM:     '#efd9a8',
+  CORAL:     '#c96a4a',
+  MINT:      '#7cb342',
+  SKY:       '#8ec9e8',
   SCENE_GREEN: {
-    skyTop: '#8fdcff', skyMid: '#c4efff', skyBot: '#eefbff',
-    cloud: '#ffffff', cloudShade: '#d8effc', sun: '#ffe066',
-    far: '#a7dcb0', farDark: '#7cc796', mid: '#63bb8b', midDark: '#3f9b6c',
-    groundTop: '#eaf4c4', groundBot: '#cfe6a8', groundLine: '#b5d18c', groundDark: '#9dbb74',
-    accent: '#ff9f68', prop: '#b5794f', propDark: '#7a4a33',
-    leaf: '#7ed6a0', leafDark: '#3f9b6c',
+    skyTop: '#79b8dc', skyMid: '#a8d6ee', skyBot: '#dcf0f7',
+    cloud: '#ffffff', cloudShade: '#cfe4ee', sun: '#ffe9a8',
+    far: '#7fae6a', farDark: '#5f9450', mid: '#5b9450', midDark: '#437a3a',
+    groundTop: '#7cb44e', groundBot: '#5f9a3e', groundLine: '#4f8735', groundDark: '#417230',
+    accent: '#e0a03c', prop: '#8a5a3b', propDark: '#5e3b25',
+    leaf: '#67a843', leafDark: '#3f7a2e',
   },
 };
 
 // ===== 元素 × 场景矩阵 =====
 export const ELEMENTS = {
-  wood:   { name: '苔藓·木', sceneKey: 'forest',  color: '#10b981' },
-  fire:   { name: '熔岩·火', sceneKey: 'volcano', color: '#f97316' },
-  water:  { name: '潮汐·水', sceneKey: 'lake',    color: '#60a5fa' },
-  thunder:{ name: '风暴·雷', sceneKey: 'peak',    color: '#a78bfa' },
-  shadow: { name: '影蚀·暗', sceneKey: 'cavern',  color: '#581c87' },
+  wood:   { name: '苔藓·木', sceneKey: 'forest',  color: '#5f9a3e' },
+  fire:   { name: '熔岩·火', sceneKey: 'volcano', color: '#c9662f' },
+  water:  { name: '潮汐·水', sceneKey: 'lake',    color: '#4f8fb8' },
+  thunder:{ name: '风暴·雷', sceneKey: 'peak',    color: '#7a6aa8' },
+  shadow: { name: '影蚀·暗', sceneKey: 'cavern',  color: '#4a3a5e' },
 };
 
 export const SCENES = {
   forest:  { name: 'Whispering Forest', element: 'wood',   colors: COLORS.SCENE_GREEN },
   volcano: { name: 'Ash Volcano',       element: 'fire',   colors: {
-    skyTop:'#ff9a6b', skyMid:'#ffc78f', skyBot:'#ffe7c2',
-    cloud:'#ffe0c4', cloudShade:'#ffc79f', sun:'#fff1a8',
-    far:'#c2664b', farDark:'#9a4632', mid:'#9a4632', midDark:'#6f2f22',
-    groundTop:'#f8dfb2', groundBot:'#e7c186', groundLine:'#cfa163', groundDark:'#b9874c',
-    accent:'#ff6b5b', prop:'#7a4a33', propDark:'#4f2d1f',
-    leaf:'#8fbf6a', leafDark:'#5c8f45', lava:'#ff8a3d', lavaLight:'#ffd166',
+    skyTop:'#b85c42', skyMid:'#d98a62', skyBot:'#f0cfa8',
+    cloud:'#f2d0b0', cloudShade:'#d9a882', sun:'#f7d99a',
+    far:'#8a4a38', farDark:'#6f3628', mid:'#6f3628', midDark:'#4e241a',
+    groundTop:'#c9a878', groundBot:'#b08a5c', groundLine:'#96703f', groundDark:'#7d5c33',
+    accent:'#d9662f', prop:'#6f4630', propDark:'#472a1d',
+    leaf:'#7d9450', leafDark:'#556b34', lava:'#e8702a', lavaLight:'#f2b34a',
   } },
   lake:    { name: 'Crystal Lake',      element: 'water',  colors: {
-    skyTop:'#7fd6ff', skyMid:'#b8ecff', skyBot:'#effbff',
-    cloud:'#ffffff', cloudShade:'#dcf3ff', sun:'#ffe066',
-    seaTop:'#63d3ea', seaBot:'#2f9fd0', foam:'#f0fcff',
-    far:'#8fd8c8', farDark:'#5bb8a8', mid:'#5bb8c9', midDark:'#3f95a8',
-    groundTop:'#ffeec0', groundBot:'#f6d995', groundLine:'#e5c184', groundDark:'#d4ac6f',
-    accent:'#ff8fab', prop:'#e46a5a', propDark:'#b3483c',
-    leaf:'#6fd6a8', leafDark:'#35a47c',
+    skyTop:'#79b8dc', skyMid:'#a8d6ee', skyBot:'#dcf0f7',
+    cloud:'#ffffff', cloudShade:'#cfe4ee', sun:'#ffe9a8',
+    seaTop:'#5a9ec0', seaBot:'#37789a', foam:'#e8f7f8',
+    far:'#6f9e88', farDark:'#4f7e6c', mid:'#5a8e94', midDark:'#3f6f78',
+    groundTop:'#e6cd94', groundBot:'#d4b273', groundLine:'#c19a5c', groundDark:'#a8834a',
+    accent:'#c96a4a', prop:'#b06a48', propDark:'#7f4630',
+    leaf:'#5f9a4a', leafDark:'#3f7a30',
   } },
   peak:    { name: 'Thunder Peak',      element: 'thunder',colors: {
-    skyTop:'#86cfff', skyMid:'#c2e8ff', skyBot:'#f0fbff',
-    cloud:'#ffffff', cloudShade:'#dbeeff', sun:'#fff4b8',
-    far:'#a8b4ee', farDark:'#8b86df', mid:'#8b86df', midDark:'#665fc4',
-    groundTop:'#dff2cf', groundBot:'#b9e2a6', groundLine:'#94c982', groundDark:'#7cb36c',
-    accent:'#ffd166', prop:'#a9714a', propDark:'#6f4a2e',
-    leaf:'#8fd48a', leafDark:'#5aa86a',
+    skyTop:'#7fb8d8', skyMid:'#b4dcee', skyBot:'#e4f3f8',
+    cloud:'#ffffff', cloudShade:'#d5e8f0', sun:'#fff2c0',
+    far:'#8a94b8', farDark:'#6f7aa0', mid:'#6f7aa0', midDark:'#556086',
+    groundTop:'#8ab86a', groundBot:'#6f9d52', groundLine:'#5b8544', groundDark:'#4a7038',
+    accent:'#d9b04a', prop:'#8a5a3b', propDark:'#5e3b25',
+    leaf:'#6f9e4a', leafDark:'#4f7a32',
   } },
   cavern:  { name: 'Abyss Cavern',      element: 'shadow', colors: {
-    skyTop:'#57479f', skyMid:'#7a67c9', skyBot:'#a794e8',
-    cloud:'#b9a9f5', cloudShade:'#8f7ce8', sun:'#bff8e6',
-    far:'#4a3c8f', farDark:'#3b2f7a', mid:'#6755b8', midDark:'#43357e',
-    groundTop:'#d8cdf8', groundBot:'#bdaef0', groundLine:'#a08ee0', groundDark:'#8776cf',
-    accent:'#7ef9d6', prop:'#4a3f8f', propDark:'#2f2a5e',
-    leaf:'#6fd6c0', leafDark:'#3fa890', crystal:'#7ef9d6',
+    skyTop:'#2f2540', skyMid:'#453757', skyBot:'#5e4d72',
+    cloud:'#7a668f', cloudShade:'#5e4d72', sun:'#8fe0c0',
+    far:'#3b2f4e', farDark:'#2c223a', mid:'#4e3f63', midDark:'#372c47',
+    groundTop:'#a090b4', groundBot:'#8776a0', groundLine:'#6f5f88', groundDark:'#5a4b72',
+    accent:'#8fe0c0', prop:'#4a3f5a', propDark:'#2f2738',
+    leaf:'#6f9e88', leafDark:'#4a7060', crystal:'#8fe0c0',
   } },
 };
 
@@ -186,6 +186,41 @@ export const SPRITES = {
     shape: 'ghost', traits: {},
   },
 };
+
+// ===== 星露谷式调色：把精灵统一成低荧光、偏暖的农场色 =====
+const STARDEW_PALETTE = {
+  mossbeast:     ['#6fae3e', '#4e7f2a'],
+  mushroom:      ['#c96a5a', '#8f4034'],
+  leafsprite:    ['#6aa844', '#47792c'],
+  flamefox:      ['#d97c3a', '#a35422'],
+  lavaspirit:    ['#c8612f', '#7c3a1a'],
+  sparkseed:     ['#e3b44a', '#b0832c'],
+  dropfrog:      ['#5f9ac4', '#3a6b96'],
+  jellyspirit:   ['#96b6cc', '#5f7f9c'],
+  bubbledragon:  ['#4f93b4', '#2f6a8a'],
+  thundermouse:  ['#ddb545', '#a5831e'],
+  cloudspirit:   ['#e4e6ea', '#a8b0bc'],
+  lightningbird: ['#9a86b8', '#6a5590'],
+  shadowbat:     ['#6f4a86', '#452a58'],
+  dreamspirit:   ['#b6a6cf', '#7a66a0'],
+  ghostseed:     ['#ddd4e6', '#947fa8'],
+};
+function warmMix(hex, target, t) {
+  const p = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const [r1, g1, b1] = p(hex), [r2, g2, b2] = p(target);
+  const f = v => Math.round(v).toString(16).padStart(2, '0');
+  return `#${f(r1 + (r2 - r1) * t)}${f(g1 + (g2 - g1) * t)}${f(b1 + (b2 - b1) * t)}`;
+}
+Object.entries(STARDEW_PALETTE).forEach(([id, [body, shade]]) => {
+  const def = SPRITES[id];
+  if (!def) return;
+  def.bodyColor = body;
+  def.shadowColor = shade;
+  if (def.evolved) {
+    def.evolved.bodyColor = warmMix(body, '#ffe9c0', 0.24);
+    def.evolved.shadowColor = warmMix(shade, '#5e3b25', 0.26);
+  }
+});
 
 // ===== 状态衰减速率（每分钟变化量） =====
 export const DECAY = {
