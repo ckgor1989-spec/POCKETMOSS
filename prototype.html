@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POCKETMOSS — 视觉原型</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #eee;
+    padding: 40px 20px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 2.2em; text-align: center; margin-bottom: 8px;
+    background: linear-gradient(90deg,#9bbc0f,#306230); -webkit-background-clip:text; background-clip:text; color:transparent; letter-spacing: 4px; }
+  .subtitle { text-align:center; color:#888; margin-bottom: 40px; font-size: 0.95em; }
+  h2 { font-size: 1.4em; margin-bottom: 20px; color: #a78bfa; border-left: 4px solid #a78bfa; padding-left: 12px; }
+  h3 { font-size: 1.1em; margin: 16px 0 8px; color: #6ee7b7; }
+  .section { margin-bottom: 50px; }
+  .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; }
+  .card {
+    background: #1a1a2e;
+    border: 2px solid #2d2d44;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .card:hover { border-color: #9bbc0f; transform: translateY(-4px); box-shadow: 0 12px 30px rgba(155,188,15,0.2); }
+  .card.selected { border-color: #6ee7b7; box-shadow: 0 0 0 3px rgba(110,231,183,0.2); }
+  .card-body { margin-top: 16px; text-align: center; }
+  .card-body p { color: #aaa; font-size: 0.88em; line-height: 1.5; }
+  .mock-shell {
+    display: flex; justify-content: center; align-items: center;
+    background: #0d1117; border-radius: 12px; padding: 24px 16px; min-height: 280px;
+  }
+  .hint { text-align: center; margin-top: 24px; color: #888; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>POCKETMOSS</h1>
+  <p class="subtitle">2.5D 像素风电子宠物 · GBAsp 外壳 · AI 对话 · 手机原生交互</p>
+
+  <!-- ===== PART 1: Shell Shape ===== -->
+  <div class="section">
+    <h2>① 外壳造型方向</h2>
+    <div class="options">
+
+      <!-- Card A -->
+      <div class="card" onclick="selectShell(this,'A')">
+        <div class="mock-shell">
+          <!-- GBAsp Classic Clamshell -->
+          <div style="background:#2a2a3a;border:3px solid #444;border-radius:16px;padding:12px;box-shadow:inset 0 -4px 0 #111;width:200px;">
+            <div style="background:#8b7355;border-radius:8px;padding:8px;box-shadow:inset 0 2px 0 #6b5344;">
+              <div style="background:#9bbc0f;border:2px solid #0f380f;border-radius:4px;height:100px;display:flex;align-items:center;justify-content:center;position:relative;">
+                <div style="width:60px;height:60px;background:repeating-linear-gradient(0deg,#306230 0 5px,#8bac0f 5px 10px);border-radius:50% 50% 40% 40%;position:relative;box-shadow:0 3px 0 #0f380f,inset 0 -6px 0 #306230;">
+                  <div style="position:absolute;top:16px;left:13px;width:8px;height:8px;background:#0f380f;border-radius:50%;"></div>
+                  <div style="position:absolute;top:16px;right:13px;width:8px;height:8px;background:#0f380f;border-radius:50%;"></div>
+                  <div style="position:absolute;top:36px;left:50%;transform:translateX(-50%);width:12px;height:4px;background:#0f380f;border-radius:0 0 6px 6px;"></div>
+                </div>
+                <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:#306230;"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px;padding:2px 6px;">
+              <div style="width:44px;height:44px;position:relative;">
+                <div style="position:absolute;top:13px;left:0;width:18px;height:18px;background:#555;border-radius:3px;"></div>
+                <div style="position:absolute;top:13px;right:0;width:18px;height:18px;background:#555;border-radius:3px;"></div>
+                <div style="position:absolute;top:0;left:13px;width:18px;height:18px;background:#555;border-radius:3px;"></div>
+                <div style="position:absolute;bottom:0;left:13px;width:18px;height:18px;background:#555;border-radius:3px;"></div>
+              </div>
+              <div style="display:flex;gap:6px;transform:rotate(-25deg);align-items:center;">
+                <div style="width:22px;height:22px;background:#8b0000;border-radius:50%;box-shadow:0 2px 0 #5a0000;"></div>
+                <div style="width:22px;height:22px;background:#00008b;border-radius:50%;box-shadow:0 2px 0 #000055;"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:12px;margin-top:3px;">
+              <div style="width:22px;height:6px;background:#444;border-radius:3px;"></div>
+              <div style="width:22px;height:6px;background:#444;border-radius:3px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>A · 经典折叠式</h3>
+          <p>还原 GBAsp 开合造型，绿色液晶屏幕，苔藓小精灵，带物理按键</p>
+        </div>
+      </div>
+
+      <!-- Card B -->
+      <div class="card" onclick="selectShell(this,'B')">
+        <div class="mock-shell" style="background:#0d1b2a;">
+          <div style="background:#1f4068;border:3px solid #0f3460;border-radius:20px;padding:8px;box-shadow:0 6px 0 #0f3460;width:210px;">
+            <div style="background:#1a1a2e;border:2px solid #2a2a3a;border-radius:6px;padding:4px;">
+              <div style="background:#0d1b2a;border-radius:2px;height:100px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,#1b263b 40%);"></div>
+                <div style="position:absolute;bottom:6px;left:15%;right:15%;height:2px;background:#e0e1dd;"></div>
+                <div style="width:55px;height:55px;position:relative;">
+                  <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:40px;height:34px;background:#e09f3e;border-radius:6px 6px 3px 3px;"></div>
+                  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:35px;height:28px;background:#e09f3e;border-radius:50% 50% 40% 40%;">
+                    <div style="position:absolute;top:10px;left:6px;width:5px;height:6px;background:#1b263b;border-radius:2px;"></div>
+                    <div style="position:absolute;top:10px;right:6px;width:5px;height:6px;background:#1b263b;border-radius:2px;"></div>
+                  </div>
+                  <div style="position:absolute;top:-4px;left:28%;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid #e09f3e;"></div>
+                  <div style="position:absolute;top:-4px;right:28%;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid #e09f3e;"></div>
+                </div>
+                <div style="position:absolute;top:4px;right:4px;background:#fff;border-radius:8px;padding:3px 6px;font-size:8px;color:#333;max-width:70px;">mrrp?</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;">
+              <div style="display:grid;grid-template-columns:repeat(3,10px);grid-template-rows:repeat(3,10px);gap:2px;">
+                <div></div><div style="background:#533483;border-radius:2px;"></div><div></div>
+                <div style="background:#533483;border-radius:2px;"></div><div></div><div style="background:#533483;border-radius:2px;"></div>
+                <div></div><div style="background:#533483;border-radius:2px;"></div><div></div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <div style="width:18px;height:18px;background:#e94560;border-radius:50%;"></div>
+                <div style="width:18px;height:18px;background:#e94560;border-radius:50%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>B · 横向直板</h3>
+          <p>横版长条机身，AI 对话气泡，物理按键 + 触摸</p>
+        </div>
+      </div>
+
+      <!-- Card C -->
+      <div class="card" onclick="selectShell(this,'C')">
+        <div class="mock-shell" style="background:#2d1b3d;">
+          <div style="background:#4a1942;border:3px solid #3d1435;border-radius:24px;padding:6px;box-shadow:0 6px 0 #3d1435;width:200px;">
+            <div style="background:#0a0a0a;border-radius:18px;padding:3px;border:2px solid #111;">
+              <div style="background:#1a0a1a;border-radius:12px 12px 2px 2px;padding:3px 8px;display:flex;justify-content:space-between;font-size:7px;color:#a78bfa;margin-bottom:2px;">
+                <span>POCKETMOSS</span><span>●●●●</span>
+              </div>
+              <div style="background:linear-gradient(#1e1b4b,#312e81);border-radius:2px;height:120px;position:relative;overflow:hidden;">
+                <div style="position:absolute;top:8px;right:10px;width:16px;height:16px;background:#fbbf24;border-radius:50%;box-shadow:0 0 16px #fbbf24;"></div>
+                <div style="position:absolute;top:14px;left:12px;width:32px;height:10px;background:#fff;border-radius:16px;opacity:0.7;"></div>
+                <div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(180deg,#065f46,#022c22);clip-path:polygon(0 30%,100% 30%,95% 100%,5% 100%);"></div>
+                <div style="position:absolute;bottom:30%;left:50%;transform:translateX(-50%);">
+                  <div style="width:34px;height:42px;position:relative;">
+                    <div style="position:absolute;bottom:0;width:34px;height:32px;background:#10b981;border-radius:5px 5px 7px 7px;box-shadow:inset -3px 0 0 #059669;"></div>
+                    <div style="position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:13px solid #34d399;"></div>
+                    <div style="position:absolute;bottom:11px;left:6px;width:4px;height:5px;background:#fff;border-radius:50%;"><div style="width:2px;height:3px;background:#000;margin-left:1px;margin-top:1px;border-radius:50%;"></div></div>
+                    <div style="position:absolute;bottom:11px;right:6px;width:4px;height:5px;background:#fff;border-radius:50%;"><div style="width:2px;height:3px;background:#000;margin-left:1px;margin-top:1px;border-radius:50%;"></div></div>
+                  </div>
+                  <div style="width:30px;height:5px;background:#000;border-radius:50%;opacity:0.3;margin:0 auto;"></div>
+                </div>
+                <div style="position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:2px;">
+                  <div style="background:#000000aa;padding:1px 4px;border-radius:3px;font-size:6px;color:#f87171;">❤ ●●●○○</div>
+                  <div style="background:#000000aa;padding:1px 4px;border-radius:3px;font-size:6px;color:#fbbf24;">⚡ ●●●●○</div>
+                  <div style="background:#000000aa;padding:1px 4px;border-radius:3px;font-size:6px;color:#60a5fa;">💧 ●●○○○</div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:center;font-size:7px;color:#a78bfa;margin-top:4px;">TAP · SWIPE · HOLD</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h3>C · 手机原生壳</h3>
+          <p>完整全屏 + HUD + 2.5D 地板透视，纯触摸交互</p>
+        </div>
+      </div>
+
+    </div>
+    <p class="hint">↑ 点击你最有感觉的一个 · 或告诉我想混合哪些元素</p>
+  </div>
+
+  <script>
+    function selectShell(el, id) {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      console.log('Selected shell:', id);
+    }
+  </script>
+</div>
+</body>
+</html>
