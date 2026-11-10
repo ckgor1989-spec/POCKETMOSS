@@ -1,6 +1,6 @@
-import { INTERACTION, WALK_EVENTS, HATCH, SPRITES, ELEMENTS } from './config.js';
+import { INTERACTION, WALK_EVENTS, HATCH, SPRITES, ELEMENTS, SCENES } from './config.js';
 import { PetState } from './state.js';
-import { routeDialog } from './ai.js';
+import { routeDialog, generateWalkEvent } from './ai.js';
 import { saveGame } from './storage.js';
 
 /** 对 pet 执行互动：应用数值 → 好感度 → 进化判定 → 触发对话 → 保存 */
@@ -19,16 +19,24 @@ export async function doInteraction(game, petId, action) {
   return { pet, text, action, evolved };
 }
 
-/** 散步：场景事件表 + L2 性格反应 + 概率掉蛋 */
+/** 散步：优先 AI 动态生成事件；失败降级到本地事件表 + L2 性格反应。发现类事件概率掉蛋 */
 export async function doWalk(game, petId) {
   const pet = game.pets[petId];
   if (!pet) return null;
 
-  const table = WALK_EVENTS[game.currentScene] ?? WALK_EVENTS.forest;
-  const event = table[Math.floor(Math.random() * table.length)];
-
   pet.applyChange(INTERACTION.walk);
   const evolved = pet.tryEvolve();
+
+  const sceneName = SCENES[game.currentScene]?.name ?? game.currentScene;
+  const aiResult = await generateWalkEvent(pet, sceneName);
+  let event, reaction;
+  if (aiResult) {
+    ({ event, reaction } = aiResult);
+  } else {
+    const table = WALK_EVENTS[game.currentScene] ?? WALK_EVENTS.forest;
+    event = table[Math.floor(Math.random() * table.length)];
+    reaction = await routeDialog('L2', pet, 'walk_event', { tag: event.tag });
+  }
 
   // 发现类事件概率掉蛋
   let gotEgg = false;
@@ -36,8 +44,6 @@ export async function doWalk(game, petId) {
     game.eggs += 1;
     gotEgg = true;
   }
-
-  const reaction = await routeDialog('L2', pet, 'walk_event', { tag: event.tag });
 
   saveGame(game);
   return { pet, event, reaction, gotEgg, evolved };

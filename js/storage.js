@@ -1,5 +1,5 @@
 import { GameState, PetState } from './state.js';
-import { SPRITES, SCENES, INITIAL_STATE, HATCH } from './config.js';
+import { SPRITES, SCENES, INITIAL_STATE, HATCH, IMPRESSION } from './config.js';
 
 const KEY_V2 = 'pocketmoss_save_v2';
 const KEY_V1 = 'pocketmoss_save_v1';
@@ -59,6 +59,8 @@ function normalize(raw) {
       pet.mood   = save.mood   ?? INITIAL_STATE.mood;
       pet.clean  = save.clean  ?? INITIAL_STATE.clean;
       pet.affection = save.affection ?? 0;
+      pet.impression = (typeof save.impression === 'number')
+        ? Math.max(IMPRESSION.MIN, Math.min(IMPRESSION.MAX, save.impression)) : 0;
       pet.evolved = save.evolved === true;
       pet.hatchedAt = save.hatchedAt ?? Date.now();
       pet.lastUpdate = save.lastUpdate ?? Date.now();
@@ -112,9 +114,17 @@ function normalize(raw) {
 
 function applyOffline(gs) {
   const now = Date.now();
-  const lastUpdate = Object.values(gs.pets).reduce((latest, p) => Math.max(latest, p.lastUpdate), now);
-  const deltaMin = Math.max(0, (now - lastUpdate) / 60000);
+  // 离线时长以"上次保存时间"为锚（pets 的 lastUpdate 会被 tick/互动刷新，不可靠）
+  const deltaMin = Math.max(0, (now - (gs.lastSaved ?? now)) / 60000);
   gs.tick(deltaMin);
+  // 离线超过宽限期 → 扣印象（太久没见，精灵会觉得被冷落）
+  const overHours = deltaMin / 60 - IMPRESSION.OFFLINE_GRACE_HOURS;
+  if (overHours > 0) {
+    const loss = Math.min(overHours * IMPRESSION.OFFLINE_DECAY_PER_HOUR, IMPRESSION.OFFLINE_DECAY_CAP);
+    Object.values(gs.pets).forEach(p => {
+      p.impression = Math.max(IMPRESSION.MIN, p.impression - loss);
+    });
+  }
   gs.lastSaved = now;
   return gs;
 }

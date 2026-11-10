@@ -78,6 +78,20 @@ body {
   pointer-events: none; z-index: 100;
 }
 
+/* 亲密彩蛋的 ♥ 粒子 */
+@keyframes heart-float {
+  0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-36px) scale(1.2); opacity: 0; }
+}
+.heart-particle {
+  position: absolute; width: 12px; height: 12px;
+  font-size: 10px; line-height: 12px; text-align: center;
+  color: #f472b6; text-shadow: 0 0 4px #f9a8d4;
+  animation: heart-float 1.4s ease-out forwards;
+  pointer-events: none; z-index: 100;
+}
+
 /* AI 对话气泡 */
 .bubble {
   position: absolute; pointer-events: none;

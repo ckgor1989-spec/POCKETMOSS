@@ -244,6 +244,8 @@ export function createSpriteEl(pet) {
     pointer-events: auto; cursor: pointer;
     z-index: 10;
   `;
+  // 呼吸动画随机相位（须在 cssText 之后设置，否则被覆盖），同场景精灵不再同步起伏
+  root.style.animationDelay = -(Math.random() * 3).toFixed(2) + 's';
 
   const body = document.createElement('div');
   body.style.cssText = 'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:60px;height:60px;';

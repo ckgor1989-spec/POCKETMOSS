@@ -1,4 +1,4 @@
-import { DECAY, INITIAL_STATE, SCENES, SPRITES, EVOLVE_AT } from './config.js';
+import { DECAY, INITIAL_STATE, SCENES, SPRITES, EVOLVE_AT, IMPRESSION } from './config.js';
 
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -19,6 +19,7 @@ export class PetState {
     this.mood = INITIAL_STATE.mood;
     this.clean = INITIAL_STATE.clean;
     this.affection = 0;
+    this.impression = 0;       // 对玩家的印象（-100~100），区别于好感度：反映长期陪伴
     this.evolved = false;      // 进阶形态（好感度达标后换色）
     this.hatchedAt = Date.now();
     this.lastUpdate = Date.now();
@@ -29,6 +30,7 @@ export class PetState {
     if (delta.mood !== undefined)      this.mood      = clamp(this.mood   + delta.mood,   0, 100);
     if (delta.clean !== undefined)     this.clean     = clamp(this.clean  + delta.clean,  0, 100);
     if (delta.affection !== undefined) this.affection = clamp(this.affection + delta.affection, 0, 100);
+    if (delta.impression !== undefined) this.impression = clamp(this.impression + delta.impression, IMPRESSION.MIN, IMPRESSION.MAX);
     this.lastUpdate = Date.now();
   }
 
@@ -49,10 +51,18 @@ export class PetState {
     return 'idle';
   }
 
+  /** 印象等级：亲密 / 熟悉 / 普通 / 疏远 */
+  get impressionLevel() {
+    if (this.impression >= 60) return '亲密';
+    if (this.impression >= 20) return '熟悉';
+    if (this.impression <= -20) return '疏远';
+    return '普通';
+  }
+
   toJSON() {
     return {
       id: this.id, hunger: this.hunger, mood: this.mood, clean: this.clean,
-      affection: this.affection, evolved: this.evolved,
+      affection: this.affection, impression: this.impression, evolved: this.evolved,
       hatchedAt: this.hatchedAt, lastUpdate: this.lastUpdate,
     };
   }

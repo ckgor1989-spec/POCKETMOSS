@@ -2,12 +2,15 @@ import { loadGame, saveGame, resetSave } from './storage.js';
 import { SceneRenderer } from './renderer.js';
 import { createSpriteEl } from './sprites.js';
 import { doInteraction, doWalk, rollHatchChoices, hatchPet, pickRandomActivePet } from './interactions.js';
-import { chatWithPet, routeDialog } from './ai.js';
+import { chatWithPet, routeDialog, generateWalkEvent } from './ai.js';
+import { initMusic, setMusicScene, toggleMusicMute, isMusicMuted } from './music.js';
 import { SCENES, SPRITES, ELEMENTS } from './config.js';
 
 // 调试便捷：挂到 window
 window.resetSave = resetSave;
 window.__game = null;
+window.__genWalk = generateWalkEvent; // 控制台直接验证 AI 散步事件生成
+window.__doWalk = doWalk;
 
 class PocketMossGame {
   constructor() {
@@ -25,10 +28,50 @@ class PocketMossGame {
     this.bindEvents();
     this.loop();
     this.clock();
+    // 每 30s 检查一次高好感精灵对的亲密彩蛋
+    this.bondTimer = setInterval(() => this.maybeBondMoment(), 30000);
+  }
+
+  /** 亲密彩蛋：当前场景里好感度都 ≥60 的一对精灵，概率触发 ♥ 粒子 + toast */
+  maybeBondMoment() {
+    const pets = this.game.activePets.filter(p => p.affection >= 60);
+    if (pets.length < 2) return;
+    if (Math.random() > 0.35) return;
+    const a = pets[Math.floor(Math.random() * pets.length)];
+    let b = a;
+    while (b === a) b = pets[Math.floor(Math.random() * pets.length)];
+    this.spawnHearts(a, b);
+    this.showToast(`${a.name} 和 ${b.name} 很亲密 ♥`);
+  }
+
+  /** 在两只精灵之间冒 ♥ 粒子 */
+  spawnHearts(petA, petB) {
+    const elA = this.petLayer.querySelector(`[data-pet-id="${petA.id}"]`);
+    const elB = this.petLayer.querySelector(`[data-pet-id="${petB.id}"]`);
+    if (!elA || !elB) return;
+    const wrapRect = this.petLayer.getBoundingClientRect();
+    const rA = elA.getBoundingClientRect();
+    const rB = elB.getBoundingClientRect();
+    const ax = rA.left - wrapRect.left + rA.width / 2;
+    const ay = rA.top - wrapRect.top + rA.height / 2;
+    const bx = rB.left - wrapRect.left + rB.width / 2;
+    const by = rB.top - wrapRect.top + rB.height / 2;
+    for (let i = 0; i < 6; i++) {
+      const t = (i + 1) / 7; // 沿两点连线分布
+      const h = document.createElement('div');
+      h.className = 'heart-particle';
+      h.textContent = '♥';
+      h.style.left = (ax + (bx - ax) * t - 6 + (Math.random() - 0.5) * 10) + 'px';
+      h.style.top  = (ay + (by - ay) * t - 6 + (Math.random() - 0.5) * 10) + 'px';
+      h.style.animationDelay = (Math.random() * 0.4).toFixed(2) + 's';
+      this.petLayer.appendChild(h);
+      setTimeout(() => h.remove(), 1600);
+    }
   }
 
   initHud() {
     this.updateSceneName();
+    this.updateMuteBtn();
     document.getElementById('battery').textContent = 'BATT●●●●';
     document.getElementById('clock').textContent = '--:--';
     this.renderSceneTabs();
@@ -72,6 +115,11 @@ class PocketMossGame {
     this.updateSceneName();
     this.renderSceneTabs();
     this.renderScene();
+    setMusicScene(key); // 切换场景 BGM
+  }
+
+  updateMuteBtn() {
+    document.getElementById('btn-mute').textContent = isMusicMuted() ? '🔇' : '🔊';
   }
 
   // ===== 场景渲染 =====
@@ -145,6 +193,15 @@ class PocketMossGame {
     document.getElementById('codex-close').addEventListener('click', () => {
       document.getElementById('codex-modal').classList.add('hidden');
     });
+    // 音乐开关
+    document.getElementById('btn-mute').addEventListener('click', (e) => {
+      e.stopPropagation();
+      initMusic(this.game.currentScene); // 若尚未初始化，点开关即启动
+      toggleMusicMute();
+      this.updateMuteBtn();
+    });
+    // 浏览器自动播放策略：首次任意交互后启动 BGM
+    document.addEventListener('pointerdown', () => initMusic(this.game.currentScene), { once: true });
     // 对话面板
     document.getElementById('chat-close').addEventListener('click', () => this.closeChat());
     document.getElementById('chat-send').addEventListener('click', () => this.sendChat());
@@ -250,8 +307,8 @@ class PocketMossGame {
     if (!reply) reply = await routeDialog('L1', pet, 'idle');
     history.push({ role: 'assistant', content: reply });
 
-    // 聊天也算互动：小幅涨心情和好感
-    pet.applyChange({ mood: +2, affection: +2 });
+    // 聊天也算互动：小幅涨心情、好感和印象
+    pet.applyChange({ mood: +2, affection: +2, impression: +1 });
     if (pet.tryEvolve()) this.announceEvolve(pet);
     saveGame(this.game);
 
@@ -350,7 +407,7 @@ class PocketMossGame {
       cell.innerHTML = `
         <div class="cc-avatar" style="background:${owned ? (pet.evolved ? SPRITES[def.id].evolved.bodyColor : def.bodyColor) : '#333'};border:1px solid ${elColor};"></div>
         <div>${owned ? def.name : '???'}</div>
-        <div class="cc-aff">${owned ? `${def.personality} · 好感 ${Math.round(pet.affection)}` : ELEMENTS[def.element].name}</div>
+        <div class="cc-aff">${owned ? `${def.personality} · 好感 ${Math.round(pet.affection)} · ${pet.impressionLevel}` : ELEMENTS[def.element].name}</div>
       `;
       grid.appendChild(cell);
     });

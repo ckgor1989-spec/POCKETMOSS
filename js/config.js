@@ -157,13 +157,21 @@ export const DECAY = {
   OFFLINE_CAP_HOURS: 6,
 };
 
-// ===== 互动效果（含好感度增量） =====
+// ===== 互动效果（含好感度/印象增量） =====
 export const INTERACTION = {
-  feed:  { hunger:  +25, mood: +5,  affection: +2 },
-  play:  { hunger:  -10, mood: +20, affection: +3 },
-  clean: { hunger:    0, mood: +5,  clean: +30, affection: +2 },
-  talk:  { hunger:    0, mood: +2,  affection: +2 },
-  walk:  { hunger:  -15, mood: +15, affection: +4 },
+  feed:  { hunger:  +25, mood: +5,  affection: +2, impression: +1 },
+  play:  { hunger:  -10, mood: +20, affection: +3, impression: +2 },
+  clean: { hunger:    0, mood: +5,  clean: +30, affection: +2, impression: +1 },
+  talk:  { hunger:    0, mood: +2,  affection: +2, impression: +1 },
+  walk:  { hunger:  -15, mood: +15, affection: +4, impression: +2 },
+};
+
+// ===== 印象系统（-100 ~ 100） =====
+export const IMPRESSION = {
+  MIN: -100, MAX: 100,
+  OFFLINE_GRACE_HOURS: 24,    // 离线宽限期，超过才开始扣印象
+  OFFLINE_DECAY_PER_HOUR: 2,  // 超过宽限期后每小时扣分
+  OFFLINE_DECAY_CAP: 30,      // 单次离线最多扣分
 };
 
 // ===== 好感度进化阈值 =====
