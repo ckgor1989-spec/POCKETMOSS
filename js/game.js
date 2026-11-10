@@ -1,6 +1,6 @@
 import { loadGame, saveGame, resetSave } from './storage.js';
 import { SceneRenderer } from './renderer.js';
-import { createSpriteEl } from './sprites.js';
+import { createSpriteEl, createPetCanvas } from './sprites.js';
 import { doInteraction, doWalk, rollHatchChoices, hatchPet, pickRandomActivePet } from './interactions.js';
 import { chatWithPet, routeDialog, generateWalkEvent } from './ai.js';
 import { initMusic, setMusicScene, toggleMusicMute, isMusicMuted } from './music.js';
@@ -19,6 +19,7 @@ class PocketMossGame {
     this.petLayer = document.getElementById('sprite-layer');
     this.bubbleLayer = document.getElementById('bubble-layer');
     this.renderer = new SceneRenderer(this.canvas, this.petLayer);
+    this.renderer.start(); // 常驻动画：视差背景 + 氛围粒子
     this.selectedPetId = null;
     this.pendingHatch = null; // { element, choices }
     this.chatPetId = null;    // 当前聊天对象
@@ -152,6 +153,13 @@ class PocketMossGame {
     this.renderHudChips();
   }
 
+  /** 小尺寸像素头像（HUD/孵化/图鉴共用） */
+  avatarEl(spriteLike, size) {
+    const cv = createPetCanvas(spriteLike);
+    cv.style.cssText = `width:${size}px;height:${size}px;image-rendering:pixelated;display:block;margin:0 auto;`;
+    return cv;
+  }
+
   renderHudChips() {
     const row = document.getElementById('hud-pets');
     row.innerHTML = '';
@@ -159,13 +167,14 @@ class PocketMossGame {
       const chip = document.createElement('div');
       chip.className = 'hud-pet-chip' + (pet.id === this.selectedPetId ? ' active' : '');
       chip.innerHTML = `
-        <div class="avatar" style="background:${pet.bodyColor};"></div>
+        <div class="avatar"></div>
         <div class="name">${pet.name}${pet.evolved ? '✦' : ''}</div>
         <div class="bar"><div style="background:#ef4444;width:${pet.hunger.toFixed(0)}%;"></div></div>
         <div class="bar"><div style="background:#fbbf24;width:${pet.mood.toFixed(0)}%;"></div></div>
         <div class="bar"><div style="background:#60a5fa;width:${pet.clean.toFixed(0)}%;"></div></div>
         <div class="bar"><div style="background:#f472b6;width:${pet.affection.toFixed(0)}%;"></div></div>
       `;
+      chip.querySelector('.avatar').appendChild(this.avatarEl(pet, 16));
       chip.addEventListener('click', () => {
         this.selectedPetId = pet.id;
         this.renderHudChips();
@@ -370,10 +379,11 @@ class PocketMossGame {
       card.className = 'hatch-card';
       card.style.borderColor = elColor;
       card.innerHTML = `
-        <div class="hc-avatar" style="background:${def.bodyColor};"></div>
+        <div class="hc-avatar"></div>
         <div class="hc-name">${def.name}</div>
         <div class="hc-pers">${def.personality}</div>
       `;
+      card.querySelector('.hc-avatar').appendChild(this.avatarEl(def, 34));
       card.addEventListener('click', () => {
         const pet = hatchPet(this.game, spriteId);
         document.getElementById('hatch-modal').classList.add('hidden');
@@ -405,10 +415,13 @@ class PocketMossGame {
       cell.className = 'codex-cell ' + (owned ? 'owned' : 'locked');
       const elColor = ELEMENTS[def.element].color;
       cell.innerHTML = `
-        <div class="cc-avatar" style="background:${owned ? (pet.evolved ? SPRITES[def.id].evolved.bodyColor : def.bodyColor) : '#333'};border:1px solid ${elColor};"></div>
+        <div class="cc-avatar" style="border-color:${elColor};"></div>
         <div>${owned ? def.name : '???'}</div>
         <div class="cc-aff">${owned ? `${def.personality} · 好感 ${Math.round(pet.affection)} · ${pet.impressionLevel}` : ELEMENTS[def.element].name}</div>
       `;
+      const av = cell.querySelector('.cc-avatar');
+      if (owned) av.appendChild(this.avatarEl(pet, 26));
+      else av.textContent = '?';
       grid.appendChild(cell);
     });
     document.getElementById('codex-modal').classList.remove('hidden');
