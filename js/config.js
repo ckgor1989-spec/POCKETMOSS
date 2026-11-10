@@ -314,7 +314,7 @@ export const L2_REACTIONS = {
 // ===== AI 接口（DeepSeek，OpenAI 兼容格式） =====
 export const AI_CONFIG = {
   endpoint: 'https://api.deepseek.com/chat/completions',
-  apiKey: '',           // ← 填入你的 DeepSeek API Key
+  apiKey: 'sk-5c991b0f03014145bc830dee057d4489',
   defaultModel: 'deepseek-chat',
-  enabled: false,       // 填入 Key 后改为 true 即启用 L3 深度对话
+  enabled: true,        // 填入 Key 后改为 true 即启用 L3 深度对话
 };
